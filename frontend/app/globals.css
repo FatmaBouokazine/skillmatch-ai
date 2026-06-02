@@ -1,27 +1,36 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;600&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7fcfc;
+  --foreground: #173536;
+  --brand: #76cdcd;
+  --brand-strong: #2f7f80;
+  --surface: #ffffff;
+  --surface-soft: #ecf9f9;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--background);
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(118, 205, 205, 0.18), transparent 36%),
+    linear-gradient(180deg, #f7fcfc 0%, #ffffff 54%, #f1fbfb 100%);
   color: var(--foreground);
-  font-family: "Space Grotesk", "Source Sans 3", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: rgba(118, 205, 205, 0.35);
+  color: #173536;
 }

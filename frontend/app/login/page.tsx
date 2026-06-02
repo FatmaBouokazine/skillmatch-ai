@@ -37,20 +37,11 @@ export default function LoginPage() {
           <p className="max-w-xl text-base text-slate-600 sm:text-lg">
             Log in to access your dashboard, review your matches, and continue where you left off.
           </p>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-[#b9e7e7] bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Secure</p>
-              <p className="mt-2 text-sm text-slate-600">JWT-backed session access.</p>
-            </div>
-            <div className="rounded-2xl border border-[#b9e7e7] bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Fast</p>
-              <p className="mt-2 text-sm text-slate-600">Jump back to your workspace quickly.</p>
-            </div>
-            <div className="rounded-2xl border border-[#b9e7e7] bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Focused</p>
-              <p className="mt-2 text-sm text-slate-600">See only the details your role needs.</p>
-            </div>
-          </div>
+          <ul className="list-disc pl-5 space-y-2 text-sm text-slate-600">
+            <li><span className="font-semibold text-[#1f6d6d]">Secure:</span> JWT-backed session access.</li>
+            <li><span className="font-semibold text-[#1f6d6d]">Fast:</span> Jump back to your workspace quickly.</li>
+            <li><span className="font-semibold text-[#1f6d6d]">Focused:</span> See only the details your role needs.</li>
+          </ul>
           <div className="flex flex-wrap gap-3">
             <Link href="/register" className="rounded-md bg-[#76cdcd] px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-[#63bcbc]">
               Create account
@@ -62,23 +53,14 @@ export default function LoginPage() {
               Back to home
             </Link>
           </div>
-          <div className="rounded-2xl border border-[#b9e7e7] bg-white p-5 shadow-sm">
+          <section className="mt-4">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">What you get after login</p>
-            <div className="mt-3 grid gap-3 sm:grid-cols-3">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">Employees</p>
-                <p className="mt-1 text-sm text-slate-600">Best-match jobs, resume feedback, and profile updates.</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-900">Recruiters</p>
-                <p className="mt-1 text-sm text-slate-600">Suggested candidates and quicker shortlisting.</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-900">Admins</p>
-                <p className="mt-1 text-sm text-slate-600">Role control, access, and platform checks.</p>
-              </div>
-            </div>
-          </div>
+            <ul className="mt-2 list-disc pl-5 space-y-2 text-sm text-slate-600">
+              <li><span className="font-semibold text-slate-900">Employees:</span> Best-match jobs, resume feedback, and profile updates.</li>
+              <li><span className="font-semibold text-slate-900">Recruiters:</span> Suggested candidates and quicker shortlisting.</li>
+              <li><span className="font-semibold text-slate-900">Admins:</span> Role control, access, and platform checks.</li>
+            </ul>
+          </section>
         </div>
 
         <div className="rounded-2xl border border-[#b9e7e7] bg-white p-8 shadow-sm">

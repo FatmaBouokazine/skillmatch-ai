@@ -61,10 +61,11 @@ export default function RegisterPage() {
               <p className="mt-2 text-sm text-slate-600">Secure access is managed by invitation only.</p>
             </div>
           </div>
-          <div className="rounded-2xl border border-[#b9e7e7] bg-white p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">What happens after registration</p>
-            <p className="mt-2 text-sm text-slate-600">Employees can find better job matches, and employers can start receiving better candidate suggestions.</p>
-          </div>
+          <ul className="list-disc pl-5 space-y-2 text-sm text-slate-600">
+            <li><span className="font-semibold text-[#1f6d6d]">Candidate:</span> Track matches and improve your resume.</li>
+            <li><span className="font-semibold text-[#1f6d6d]">Recruiter:</span> Review candidate suggestions and pipelines.</li>
+            <li><span className="font-semibold text-[#1f6d6d]">Admin:</span> Accounts are provisioned by invitation only.</li>
+          </ul>
           <div className="flex flex-wrap gap-3">
             <Link href="/login" className="rounded-md bg-[#76cdcd] px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-[#63bcbc]">
               Sign in

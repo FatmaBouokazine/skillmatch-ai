@@ -20,15 +20,6 @@ const seedDB = async () => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash('password123', salt);
 
-    // Create Admins
-    const admin = await User.create({
-      name: 'System Admin',
-      email: 'admin@skillmatch.ai',
-      password: hashedPassword,
-      role: 'admin',
-      bio: 'Platform administration account.'
-    });
-
     // Create Recruiters
     const recruiterTesla = await User.create({
       name: 'Elon Recruiter',
@@ -59,6 +50,8 @@ const seedDB = async () => {
       bio: 'Passionate frontend developer specialized in React, TypeScript, and minimalist user experiences. 3 years of building modern web applications.',
       skills: ['React', 'TypeScript', 'TailwindCSS', 'CSS', 'JavaScript', 'HTML5', 'Next.js'],
       resumeScore: 85,
+      topResumeScore: 85,
+      lastResumeScore: 85,
       resumeFeedback: [
         'Great skill alignment for modern web development.',
         'Consider adding back-end skills (e.g. Node.js) to broaden career options.'
@@ -73,6 +66,8 @@ const seedDB = async () => {
       bio: 'Backend software engineer with 5+ years of experience building secure REST APIs and microservices. Expert in Node.js and cloud databases.',
       skills: ['Node.js', 'Express', 'MongoDB', 'Docker', 'PostgreSQL', 'TypeScript', 'AWS'],
       resumeScore: 90,
+      topResumeScore: 90,
+      lastResumeScore: 90,
       resumeFeedback: [
         'Strong back-end foundation and database skills.',
         'Add a link to your public GitHub profile or portfolio in your bio.'

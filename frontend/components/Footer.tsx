@@ -11,11 +11,11 @@ export default function Footer() {
           </div>
           <div className="flex gap-6 text-zinc-500">
             <Link href="/" className="hover:text-zinc-900 transition duration-150">Home</Link>
-            <Link href="/solution" className="hover:text-zinc-900 transition duration-150">Solution</Link>
-            <Link href="/about" className="hover:text-zinc-900 transition duration-150">About</Link>
+            <Link href="/login" className="hover:text-zinc-900 transition duration-150">Sign In</Link>
+            <Link href="/register" className="hover:text-zinc-900 transition duration-150">Register</Link>
           </div>
         </div>
-        
+
         <div className="mt-6 pt-6 border-t border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>Built by: Azer Idoudi, Houssem B.S Salem, Yasmine Haba, Fatma Bouokkazine</p>
           <p>&copy; {new Date().getFullYear()} SkillMatch AI. All rights reserved.</p>

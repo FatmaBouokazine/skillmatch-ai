@@ -2,35 +2,57 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
-// Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: '7d'
   });
 };
 
+const scoreResume = (user) => {
+  let score = 30;
+  const feedback = [];
 
-// REGISTER
+  if (user.resumeText && user.resumeText.length > 50) {
+    score += 25;
+  } else {
+    feedback.push('Add more detail to your resume text.');
+  }
+
+  if (user.bio && user.bio.length > 20) {
+    score += 15;
+  } else {
+    feedback.push('Add a professional bio in your profile.');
+  }
+
+  if (user.skills && user.skills.length > 0) {
+    score += Math.min(user.skills.length * 8, 30);
+    if (user.skills.length < 4) {
+      feedback.push('Add at least 4 technical skills in your profile.');
+    }
+  } else {
+    feedback.push('Add technical skills in your profile to improve your score.');
+  }
+
+  score = Math.min(score, 100);
+  return { score, feedback };
+};
+
 exports.register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // Vérifier si user existe
-    const userExists = await User.findOne({ email });
-
-    if (userExists) {
-      return res.status(400).json({
-        message: 'User already exists'
-      });
+    if (!['candidate', 'recruiter'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid role' });
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
 
+    const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
     const user = await User.create({
       name,
       email,
@@ -45,37 +67,23 @@ exports.register = async (req, res) => {
       role: user.role,
       token: generateToken(user._id)
     });
-
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
-
-// LOGIN
 exports.login = async (req, res) => {
   try {
-
     const { email, password } = req.body;
-
-    // Vérifier user
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({
-        message: 'Invalid email'
-      });
+      return res.status(401).json({ message: 'Invalid email' });
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
-      return res.status(401).json({
-        message: 'Invalid password'
-      });
+      return res.status(401).json({ message: 'Invalid password' });
     }
 
     res.status(200).json({
@@ -85,21 +93,15 @@ exports.login = async (req, res) => {
       role: user.role,
       token: generateToken(user._id)
     });
-
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
-
-// PROFILE (Protected)
 exports.getProfile = async (req, res) => {
   res.status(200).json(req.user);
 };
 
-// UPDATE PROFILE (Protected)
 exports.updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -120,36 +122,35 @@ exports.updateProfile = async (req, res) => {
     if (companyWebsite !== undefined) user.companyWebsite = companyWebsite;
     if (companyBio !== undefined) user.companyBio = companyBio;
 
-    // Simulate resume scoring if candidate updates skills or bio
-    if (user.role === 'candidate' && (skills || bio)) {
-      // Simple dynamic scoring based on details filled out
-      let score = 30;
-      const feedback = [];
-      
-      if (user.bio && user.bio.length > 20) {
-        score += 20;
-      } else {
-        feedback.push('Add a professional bio description detailing your goals.');
-      }
-      
-      if (user.skills && user.skills.length > 0) {
-        score += Math.min(user.skills.length * 10, 40);
-        if (user.skills.length < 4) {
-          feedback.push('Add at least 4 key technical skill tags to improve matching visibility.');
-        }
-      } else {
-        feedback.push('Add technical skills (e.g. React, Node, Python) to match with recruiter requirements.');
-      }
+    await user.save();
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-      if (user.bio.includes('experience') || user.bio.includes('developer') || user.bio.includes('engineer')) {
-        score += 10;
-      } else {
-        feedback.push('Describe your professional experience or title in your bio.');
-      }
-
-      user.resumeScore = score;
-      user.resumeFeedback = feedback;
+exports.evaluateResume = async (req, res) => {
+  try {
+    if (req.user.role !== 'candidate') {
+      return res.status(403).json({ message: 'Only candidates can evaluate resumes' });
     }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { resumeText } = req.body;
+    if (!resumeText || !resumeText.trim()) {
+      return res.status(400).json({ message: 'Resume text is required' });
+    }
+
+    user.resumeText = resumeText.trim();
+    const { score, feedback } = scoreResume(user);
+    user.resumeScore = score;
+    user.lastResumeScore = score;
+    user.topResumeScore = Math.max(user.topResumeScore || 0, score);
+    user.resumeFeedback = feedback;
 
     await user.save();
     res.status(200).json(user);
@@ -158,59 +159,29 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// GET ALL USERS (Admin Only)
-exports.getAllUsers = async (req, res) => {
+exports.changePassword = async (req, res) => {
   try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Admin access required' });
-    }
-    const users = await User.find({}).select('-password');
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+    const { currentPassword, newPassword } = req.body;
 
-// UPDATE USER ROLE (Admin Only)
-exports.updateUserRole = async (req, res) => {
-  try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Admin access required' });
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current and new password are required' });
     }
 
-    const { role } = req.body;
-    if (!['candidate', 'recruiter', 'admin'].includes(role)) {
-      return res.status(400).json({ message: 'Invalid role' });
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
     }
 
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const user = await User.findById(req.user._id);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
     }
 
-    user.role = role;
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
 
-    res.status(200).json({ message: 'User role updated successfully', user: { _id: user._id, role: user.role } });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// DELETE USER (Admin Only)
-exports.deleteUser = async (req, res) => {
-  try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Admin access required' });
-    }
-
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    await User.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: 'User deleted successfully', userId: req.params.id });
+    res.status(200).json({ message: 'Password updated successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

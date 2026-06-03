@@ -40,10 +40,10 @@ export default function Home() {
                   Create Account
                 </Link>
                 <Link 
-                  href="/solution" 
+                  href="/login" 
                   className="rounded-lg border border-zinc-200 bg-white px-6 py-3 text-sm font-semibold text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition duration-150"
                 >
-                  Learn More
+                  Sign In
                 </Link>
               </>
             )}
@@ -82,12 +82,12 @@ export default function Home() {
           <p className="mt-2 text-zinc-500 text-sm sm:text-base">We have designed dedicated dashboards to eliminate the friction in shortlisting.</p>
         </div>
         
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
           <div className="bg-white border border-zinc-200 p-6 rounded-xl shadow-xs space-y-4">
             <div className="text-xl">📄</div>
             <h3 className="font-semibold text-zinc-800 text-base">For Candidates</h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Verify your resume alignment. See exactly which skills match or are missing for any role, receive a simulated AI feedback list, and track application statuses.
+              Upload your resume, track top and last scores, and manage your profile and account from a simple dashboard.
             </p>
           </div>
 
@@ -95,15 +95,7 @@ export default function Home() {
             <div className="text-xl">💼</div>
             <h3 className="font-semibold text-zinc-800 text-base">For Recruiters</h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Add postings with custom skill requirements, review applicants sorted by exact skill alignment, and shortlist or decline candidates with a click.
-            </p>
-          </div>
-
-          <div className="bg-white border border-zinc-200 p-6 rounded-xl shadow-xs space-y-4">
-            <div className="text-xl">🛡️</div>
-            <h3 className="font-semibold text-zinc-800 text-base">For Admins</h3>
-            <p className="text-xs text-zinc-500 leading-relaxed">
-              Review accounts, change user roles, monitor system latencies, and check live database status tables in a secure, central administration dashboard.
+              Post jobs, see how many candidates you have hired, and manage your company profile and account settings.
             </p>
           </div>
         </div>

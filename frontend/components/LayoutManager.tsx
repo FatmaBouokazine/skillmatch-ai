@@ -11,7 +11,7 @@ export default function LayoutManager({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const { loading, user } = useAuth();
 
-  const isAppRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/profile');
+  const isAppRoute = pathname.startsWith('/dashboard');
 
   if (isAppRoute) {
     if (loading) {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import { AuthProvider } from "../context/AuthContext";
+import LayoutManager from "../components/LayoutManager";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,12 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-[#f7fcfc] text-slate-900">
-        <Header />
-        <main className="flex-1 px-6 py-6">
-          <div className="mx-auto w-full max-w-6xl">{children}</div>
-        </main>
-        <Footer />
+      <body className="min-h-full bg-zinc-50 text-zinc-900">
+        <AuthProvider>
+          <LayoutManager>{children}</LayoutManager>
+        </AuthProvider>
       </body>
     </html>
   );

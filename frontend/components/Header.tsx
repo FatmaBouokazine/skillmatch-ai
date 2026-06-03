@@ -2,49 +2,49 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-const links = [
-  { href: '/', label: 'Home' },
-  { href: '/solution', label: 'Solution' },
-  { href: '/about', label: 'About' },
-];
+import { useAuth } from '../context/AuthContext';
 
 export default function Header() {
   const pathname = usePathname();
+  const { token } = useAuth();
 
   return (
-    <header className="flex items-center justify-between border-b border-slate-200 bg-white p-4">
-      <Link href="/" className="text-sm font-semibold tracking-wider text-indigo-600">
-        SkillMatch AI
-      </Link>
-      <nav className="hidden items-center gap-4 text-sm sm:flex">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={
-              pathname === link.href
-                ? 'text-slate-900 font-semibold rounded-md px-2 py-1 bg-indigo-50'
-                : 'text-slate-700 hover:text-slate-900 rounded-md px-2 py-1 hover:bg-indigo-50'
-            }
-          >
-            {link.label}
-          </Link>
-        ))}
-      </nav>
-      <div className="flex items-center gap-3 text-sm">
-        <Link
-          href="/login"
-          className="rounded-md border border-slate-200 px-3 py-1 text-slate-700 hover:bg-slate-50"
-        >
-          Login
+    <header className="border-b border-zinc-150 bg-white/80 backdrop-blur-xs py-4 px-6 md:px-8 sticky top-0 z-50">
+      <div className="mx-auto w-full max-w-6xl flex items-center justify-between">
+        <Link href="/" className="font-semibold text-zinc-900 tracking-tight flex items-center gap-2 text-base">
+          <span className="w-2.5 h-2.5 rounded-full bg-zinc-950"></span>
+          SkillMatch AI
         </Link>
-        <Link
-          href="/register"
-          className="rounded-md bg-[#76cdcd] px-3 py-1 font-semibold text-slate-900 hover:bg-[#63bcbc]"
-        >
-          Register
-        </Link>
+
+        <div className="flex items-center gap-3 text-xs">
+          {token ? (
+            <Link
+              href="/dashboard"
+              className={`rounded-lg px-4 py-2 font-medium transition duration-150 ${
+                pathname.startsWith('/dashboard')
+                  ? 'bg-zinc-900 text-white'
+                  : 'border border-zinc-200 text-zinc-600 hover:text-zinc-900'
+              }`}
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="rounded-lg border border-zinc-200 px-4 py-2 font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition duration-150"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className="rounded-lg bg-zinc-900 px-4 py-2 font-semibold text-white hover:bg-zinc-800 transition duration-150 shadow-xs"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );

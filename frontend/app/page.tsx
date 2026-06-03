@@ -1,128 +1,139 @@
+'use client';
+
 import Link from 'next/link';
+import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
+  const { token } = useAuth();
+
   return (
-    <div className="flex flex-col gap-20">
-      <section className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+    <div className="flex flex-col gap-20 py-6 font-sans">
+      
+      {/* HERO SECTION */}
+      <section className="grid gap-12 lg:grid-cols-2 items-center">
         <div className="space-y-6">
-          <span className="inline-flex rounded-full border border-[#b9e7e7] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#1f6d6d] shadow-sm">
-            AI matching for both sides
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-zinc-600 shadow-xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Intelligence-backed Job Placement
           </span>
-          <h1 className="max-w-2xl text-5xl font-bold leading-tight sm:text-6xl">
-            Find your best-match job offers.
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-zinc-900 leading-tight">
+            Connecting talent through skills, not keywords.
           </h1>
-          <p className="max-w-xl text-base text-slate-600 sm:text-lg">
-            Employees can see the roles that fit them best and rate their resume. Employers get suggested candidates with clear match signals.
+          <p className="text-base sm:text-lg text-zinc-500 max-w-xl leading-relaxed">
+            SkillMatch AI parses resumes and evaluates match percentages dynamically. Candidates get actionable resume feedback, and recruiters get pre-screened pipelines.
           </p>
-          <ul className="space-y-2 text-sm text-slate-600">
-            <li>• Employees see best-match jobs and get resume feedback.</li>
-            <li>• Employers receive suggested candidates with clearer fit signals.</li>
-            <li>• Both sides save time through simpler screening and shortlisting.</li>
-          </ul>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-[#b9e7e7] bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Employee view</p>
-              <p className="mt-2 text-sm text-slate-600">Find the right roles faster.</p>
-            </div>
-            <div className="rounded-2xl border border-[#b9e7e7] bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Employer view</p>
-              <p className="mt-2 text-sm text-slate-600">Shortlist better candidates.</p>
-            </div>
-            <div className="rounded-2xl border border-[#b9e7e7] bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Shared outcome</p>
-              <p className="mt-2 text-sm text-slate-600">Less time wasted on mismatches.</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/register" className="rounded-md bg-[#76cdcd] px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-[#63bcbc]">Create account</Link>
-            <Link href="/solution" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">Learn more</Link>
-            <Link href="/about" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">About us</Link>
+          
+          <div className="flex flex-wrap gap-3 pt-2">
+            {token ? (
+              <Link 
+                href="/dashboard" 
+                className="rounded-lg bg-zinc-900 px-6 py-3 text-sm font-semibold text-white hover:bg-zinc-800 transition duration-150 shadow-xs"
+              >
+                Go to Workspace
+              </Link>
+            ) : (
+              <>
+                <Link 
+                  href="/register" 
+                  className="rounded-lg bg-zinc-900 px-6 py-3 text-sm font-semibold text-white hover:bg-zinc-800 transition duration-150 shadow-xs"
+                >
+                  Create Account
+                </Link>
+                <Link 
+                  href="/login" 
+                  className="rounded-lg border border-zinc-200 bg-white px-6 py-3 text-sm font-semibold text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition duration-150"
+                >
+                  Sign In
+                </Link>
+              </>
+            )}
           </div>
         </div>
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-8 shadow-sm">
+
+        {/* Visual panel */}
+        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-8 shadow-xs space-y-6">
+          <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-widest">Platform capabilities</h3>
           <div className="space-y-4">
-            <div className="rounded-xl border border-[#d7f1f1] bg-white p-5 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Employee detail</p>
-              <p className="mt-2 text-sm text-slate-600">Upload a resume, see match quality, and know what to improve.</p>
+            <div className="bg-white border border-zinc-200 p-5 rounded-xl shadow-xs transition duration-200 hover:border-zinc-300">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Candidate Service</span>
+                <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Auto-Matching</span>
+              </div>
+              <p className="mt-2 text-sm font-medium text-zinc-800">Dynamic Resume Rating</p>
+              <p className="mt-1 text-xs text-zinc-500">Upload your profile to receive instant skills scores and customized improvement insights.</p>
             </div>
-            <div className="rounded-xl border border-[#d7f1f1] bg-white p-5 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Employer detail</p>
-              <p className="mt-2 text-sm text-slate-600">Get suggested candidates ranked by fit, not just keywords.</p>
-            </div>
-            <div className="rounded-xl border border-[#d7f1f1] bg-white p-5 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Key benefit</p>
-              <p className="mt-2 text-sm text-slate-600">A simpler workflow for matching jobs with people.</p>
+
+            <div className="bg-white border border-zinc-200 p-5 rounded-xl shadow-xs transition duration-200 hover:border-zinc-300">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Recruiter Service</span>
+                <span className="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-medium">Ranked Pipelines</span>
+              </div>
+              <p className="mt-2 text-sm font-medium text-zinc-800">Direct Requisition Matches</p>
+              <p className="mt-1 text-xs text-zinc-500">Post job requirements and see candidates sorted instantly by calculated fit percentages.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-8 sm:grid-cols-2">
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900">For employees</h3>
-          <ul className="mt-3 space-y-2 text-sm text-slate-600">
-            <li>• Discover job offers that match your skills and experience.</li>
-            <li>• Rate your resume to get clearer improvement suggestions.</li>
-            <li>• Track how well each role fits your profile before applying.</li>
-          </ul>
+      {/* CORE WORKFLOWS */}
+      <section className="border-t border-zinc-200 pt-16">
+        <div className="max-w-2xl">
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">Tailored experiences for both sides</h2>
+          <p className="mt-2 text-zinc-500 text-sm sm:text-base">We have designed dedicated dashboards to eliminate the friction in shortlisting.</p>
         </div>
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900">For employers</h3>
-          <ul className="mt-3 space-y-2 text-sm text-slate-600">
-            <li>• Receive suggested candidates ranked by skills and fit.</li>
-            <li>• Review match summaries to compare applicants faster.</li>
-            <li>• Reduce manual screening and focus on the best profiles.</li>
-          </ul>
-        </div>
-      </section>
+        
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div className="bg-white border border-zinc-200 p-6 rounded-xl shadow-xs space-y-4">
+            <div className="text-xl">📄</div>
+            <h3 className="font-semibold text-zinc-800 text-base">For Candidates</h3>
+            <p className="text-xs text-zinc-500 leading-relaxed">
+              Upload your resume, track top and last scores, and manage your profile and account from a simple dashboard.
+            </p>
+          </div>
 
-      <section className="pt-12">
-        <h2 className="text-3xl font-semibold text-slate-900">Why choose us</h2>
-        <div className="mt-6 grid gap-6 sm:grid-cols-3">
-          <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 text-center shadow-sm">
-            <h3 className="font-semibold text-slate-900">Accurate matches</h3>
-            <p className="mt-2 text-sm text-slate-600">Matches based on real skills and relevance, not just keywords.</p>
-          </div>
-          <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 text-center shadow-sm">
-            <h3 className="font-semibold text-slate-900">Easy resume rating</h3>
-            <p className="mt-2 text-sm text-slate-600">Rate your resume to get better, personalized job suggestions.</p>
-          </div>
-          <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 text-center shadow-sm">
-            <h3 className="font-semibold text-slate-900">Faster hiring</h3>
-            <p className="mt-2 text-sm text-slate-600">Employers get concise candidate suggestions to accelerate decisions.</p>
+          <div className="bg-white border border-zinc-200 p-6 rounded-xl shadow-xs space-y-4">
+            <div className="text-xl">💼</div>
+            <h3 className="font-semibold text-zinc-800 text-base">For Recruiters</h3>
+            <p className="text-xs text-zinc-500 leading-relaxed">
+              Post jobs, see how many candidates you have hired, and manage your company profile and account settings.
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold text-slate-900">How clients use it</h2>
-          <p className="mt-3 text-sm text-slate-600">
-            The experience is designed for both sides of the market: employees get guidance, and employers get shortlists.
-          </p>
+      {/* STATS / OUTCOMES */}
+      <section className="bg-zinc-900 text-white rounded-2xl p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="space-y-2 max-w-md">
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">Ready to optimize your hiring experience?</h2>
+          <p className="text-zinc-400 text-sm">Create an account or sign in to get started with the SkillMatch AI engine.</p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {[
-            { title: 'Upload or post', desc: 'Employees upload a resume. Employers post role requirements.' },
-            { title: 'Review the match', desc: 'The platform compares skills, experience, and role fit.' },
-            { title: 'Take action', desc: 'Employees apply with confidence. Employers contact better matches faster.' },
-          ].map((item) => (
-            <div key={item.title} className="rounded-2xl border border-[#b9e7e7] bg-white p-5 shadow-sm">
-              <h3 className="font-semibold text-slate-900">{item.title}</h3>
-              <p className="mt-2 text-sm text-slate-600">{item.desc}</p>
-            </div>
-          ))}
+        <div className="flex flex-wrap gap-3">
+          {token ? (
+            <Link 
+              href="/dashboard" 
+              className="rounded-lg bg-white text-zinc-900 px-6 py-3 text-sm font-semibold hover:bg-zinc-100 transition duration-150"
+            >
+              Enter Application
+            </Link>
+          ) : (
+            <>
+              <Link 
+                href="/register" 
+                className="rounded-lg bg-white text-zinc-900 px-6 py-3 text-sm font-semibold hover:bg-zinc-100 transition duration-150"
+              >
+                Sign Up Now
+              </Link>
+              <Link 
+                href="/login" 
+                className="rounded-lg border border-zinc-700 text-white bg-zinc-800 px-6 py-3 text-sm font-semibold hover:bg-zinc-700 transition duration-150"
+              >
+                Sign In
+              </Link>
+            </>
+          )}
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[#b9e7e7] bg-white p-12 text-center">
-        <h2 className="text-3xl font-semibold text-slate-900">Ready to match</h2>
-        <p className="mx-auto mt-3 max-w-lg text-sm text-slate-600">Create an account, upload a resume, or post a role to start receiving matches and suggestions.</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link href="/register" className="rounded-md bg-[#76cdcd] px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-[#63bcbc]">Create account</Link>
-          <Link href="/login" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">Sign in</Link>
-        </div>
-      </section>
     </div>
   );
 }

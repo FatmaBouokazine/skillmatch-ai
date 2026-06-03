@@ -1,115 +1,104 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { loginUser } from '../../services/authService';
+import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errorMsg) setErrorMsg(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg(null);
+    setSubmitting(true);
     try {
       const data = await loginUser(formData);
-      localStorage.setItem('token', data.token);
-      router.push('/dashboard');
-    } catch (error) {
-      alert('Login Failed');
+      await login(data.token);
+    } catch (error: any) {
+      setErrorMsg(error.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="flex flex-col gap-10">
-      <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-        <div className="space-y-6">
-          <span className="inline-flex rounded-full border border-[#b9e7e7] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#1f6d6d] shadow-sm">
-            Sign in
-          </span>
-          <h1 className="max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">
-            Welcome back to <span className="text-[#1f6d6d]">SkillMatch AI</span>
-          </h1>
-          <p className="max-w-xl text-base text-slate-600 sm:text-lg">
-            Log in to access your dashboard, review your matches, and continue where you left off.
-          </p>
-          <ul className="list-disc pl-5 space-y-2 text-sm text-slate-600">
-            <li><span className="font-semibold text-[#1f6d6d]">Secure:</span> JWT-backed session access.</li>
-            <li><span className="font-semibold text-[#1f6d6d]">Fast:</span> Jump back to your workspace quickly.</li>
-            <li><span className="font-semibold text-[#1f6d6d]">Focused:</span> See only the details your role needs.</li>
-          </ul>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/register" className="rounded-md bg-[#76cdcd] px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-[#63bcbc]">
-              Create account
-            </Link>
-            <Link href="/solution" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">
-              Learn more
-            </Link>
-            <Link href="/" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">
-              Back to home
-            </Link>
-          </div>
-          <section className="mt-4">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">What you get after login</p>
-            <ul className="mt-2 list-disc pl-5 space-y-2 text-sm text-slate-600">
-              <li><span className="font-semibold text-slate-900">Employees:</span> Best-match jobs, resume feedback, and profile updates.</li>
-              <li><span className="font-semibold text-slate-900">Recruiters:</span> Suggested candidates and quicker shortlisting.</li>
-              <li><span className="font-semibold text-slate-900">Admins:</span> Role control, access, and platform checks.</li>
-            </ul>
-          </section>
+    <div className="flex items-center justify-center py-10 md:py-16 font-sans">
+      <div className="w-full max-w-md bg-white border border-zinc-200 rounded-2xl p-8 shadow-xs space-y-6">
+        
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <Link href="/" className="inline-flex items-center gap-1.5 font-semibold text-zinc-900 tracking-tight text-sm justify-center">
+            <span className="w-2 h-2 rounded-full bg-zinc-950"></span>
+            SkillMatch AI
+          </Link>
+          <h2 className="text-2xl font-bold text-zinc-900 tracking-tight">Welcome Back</h2>
+          <p className="text-xs text-zinc-500">Sign in to access your skills dashboard workspace.</p>
         </div>
 
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-8 shadow-sm">
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold">Login</h2>
-            <p className="text-sm text-slate-500">
-              Use your account credentials to continue.
-            </p>
+        {/* Error Banner */}
+        {errorMsg && (
+          <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-xs text-red-600 font-medium">
+            {errorMsg}
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-600">Email Address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              onChange={handleChange}
+              value={formData.email}
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition duration-150"
+              required
+            />
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
-              Email
-              <input
-                type="email"
-                name="email"
-                placeholder="you@email.com"
-                onChange={handleChange}
-                className="rounded-md border border-[#b9e7e7] bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-[#76cdcd]"
-                required
-              />
-            </label>
-
-            <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
-              Password
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                onChange={handleChange}
-                className="rounded-md border border-[#b9e7e7] bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-[#76cdcd]"
-                required
-              />
-            </label>
-
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>JWT-secured session</span>
-              <span>Need access to another role? Use the register page.</span>
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-semibold text-zinc-600">Password</label>
             </div>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter password"
+              onChange={handleChange}
+              value={formData.password}
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition duration-150"
+              required
+            />
+          </div>
 
-            <button
-              type="submit"
-              className="rounded-md bg-[#76cdcd] px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-[#63bcbc] focus:outline-none"
-            >
-              Login
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full rounded-lg bg-zinc-900 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 transition duration-150 shadow-xs flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {submitting ? 'Authenticating...' : 'Sign In'}
+          </button>
+        </form>
+
+        {/* Footer */}
+        <div className="text-center pt-2 border-t border-zinc-100 text-xs text-zinc-500">
+          New to SkillMatch?{' '}
+          <Link href="/register" className="font-semibold text-zinc-800 hover:underline">
+            Create an Account
+          </Link>
         </div>
-      </section>
+
+      </div>
     </div>
   );
 }

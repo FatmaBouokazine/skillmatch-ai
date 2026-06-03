@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const seedDB = require('./seeder');
 
 const connectDB = async () => {
   try {
@@ -10,6 +11,9 @@ const connectDB = async () => {
 
     await mongoose.connect(mongoUri);
     console.log('MongoDB Connected');
+    
+    // Seed DB with mock data if empty
+    await seedDB();
   } catch (error) {
     console.error('Database connection failed:', error.message);
     process.exit(1);

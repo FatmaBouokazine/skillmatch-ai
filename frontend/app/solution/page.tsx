@@ -1,114 +1,105 @@
+'use client';
+
 import Link from 'next/link';
+import { useAuth } from '../../context/AuthContext';
 
 export default function SolutionPage() {
+  const { token } = useAuth();
+
   return (
-    <div className="flex flex-col gap-16">
-      <section className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+    <div className="flex flex-col gap-16 py-6 font-sans">
+      
+      {/* Introduction */}
+      <section className="grid gap-12 lg:grid-cols-2 items-center">
         <div className="space-y-6">
-          <span className="inline-flex rounded-full border border-[#b9e7e7] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#1f6d6d] shadow-sm">
-            The solution
+          <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-white px-2.5 py-0.5 text-xs font-semibold text-zinc-500 shadow-xs">
+            Our Solution
           </span>
-          <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">What we do</h1>
-          <p className="max-w-xl text-base text-neutral-600 sm:text-lg">
-            Employees can see their best-match job offers and rate their resumes. Employers receive suggested candidates based on skills and fit.
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 leading-tight">
+            An automated, skill-first matching ecosystem.
+          </h1>
+          <p className="text-base sm:text-lg text-zinc-500 leading-relaxed">
+            SkillMatch AI parses technical competencies directly from profiles and resumes, cross-checking them against requirements to produce real-time match rankings.
           </p>
-          <ul className="space-y-2 text-sm text-slate-600">
-            <li>• Employees review their best-fit jobs and get resume feedback.</li>
-            <li>• Employers receive suggested candidates with relevant match summaries.</li>
-            <li>• The process is designed to keep the next step obvious for both sides.</li>
+          <div className="flex flex-wrap gap-3">
+            {token ? (
+              <Link 
+                href="/dashboard" 
+                className="rounded-lg bg-zinc-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-zinc-800 transition duration-150"
+              >
+                Go to Workspace
+              </Link>
+            ) : (
+              <>
+                <Link 
+                  href="/register" 
+                  className="rounded-lg bg-zinc-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-zinc-800 transition duration-150"
+                >
+                  Create Account
+                </Link>
+                <Link 
+                  href="/about" 
+                  className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-xs font-semibold text-zinc-600 hover:bg-zinc-50 transition duration-150"
+                >
+                  About Our Team
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Feature list panel */}
+        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-8 space-y-6">
+          <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Matching pipeline steps</h3>
+          <ul className="space-y-4 text-sm text-zinc-600">
+            <li className="flex gap-3">
+              <span className="text-zinc-400 font-semibold">Step 1</span>
+              <div>
+                <p className="font-medium text-zinc-800">Job requirements definition</p>
+                <p className="text-xs text-zinc-500 mt-0.5">Recruiters specify key skill tags required for the requisition.</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-zinc-400 font-semibold">Step 2</span>
+              <div>
+                <p className="font-medium text-zinc-800">Profile & Resume mapping</p>
+                <p className="text-xs text-zinc-500 mt-0.5">Candidates input their technical skills. Resumes are evaluated for completeness.</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-zinc-400 font-semibold">Step 3</span>
+              <div>
+                <p className="font-medium text-zinc-800">Live capability calculation</p>
+                <p className="text-xs text-zinc-500 mt-0.5">Our engine calculates matches on-the-fly and presents clear fit signals.</p>
+              </div>
+            </li>
           </ul>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-[#b9e7e7] bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Step 1</p>
-              <p className="mt-2 text-sm text-slate-600">Upload resume or role details.</p>
-            </div>
-            <div className="rounded-2xl border border-[#b9e7e7] bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Step 2</p>
-              <p className="mt-2 text-sm text-slate-600">Compare skills, experience, and fit.</p>
-            </div>
-            <div className="rounded-2xl border border-[#b9e7e7] bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Step 3</p>
-              <p className="mt-2 text-sm text-slate-600">Apply or shortlist with confidence.</p>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-8 shadow-sm">
-          <div className="space-y-4">
-            <div className="rounded-xl border border-[#d7f1f1] bg-white p-5 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Employee detail</p>
-              <p className="mt-2 text-sm text-slate-600">Best-match jobs, resume feedback, and clearer next steps.</p>
-            </div>
-            <div className="rounded-xl border border-[#d7f1f1] bg-white p-5 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#1f6d6d]">Employer detail</p>
-              <p className="mt-2 text-sm text-slate-600">Ranked candidate suggestions and concise match summaries.</p>
-            </div>
-          </div>
         </div>
       </section>
 
-      <section className="grid gap-8 lg:grid-cols-2">
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold text-neutral-900">For employees</h2>
-          <ul className="mt-3 space-y-2 text-sm text-neutral-600">
-            <li>• See which job offers match you best based on your skills.</li>
-            <li>• Rate your resume to understand what can be improved.</li>
-            <li>• Use the match view to focus on the most relevant roles first.</li>
+      {/* Grid panels */}
+      <section className="grid gap-6 md:grid-cols-2">
+        <div className="bg-white border border-zinc-200 p-6 rounded-xl shadow-xs space-y-4">
+          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">For Candidates</span>
+          <h3 className="text-lg font-semibold text-zinc-800">Improve resume score and check alignment</h3>
+          <ul className="space-y-2 text-xs text-zinc-500 leading-relaxed">
+            <li>• See how your profile fits each job with an explicit matching percentage indicator.</li>
+            <li>• Evaluate your resume to obtain an automated rating score out of 100.</li>
+            <li>• View a checklist detailing matched skills vs missing skills for target roles.</li>
           </ul>
         </div>
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold text-neutral-900">For employers</h2>
-          <ul className="mt-3 space-y-2 text-sm text-neutral-600">
-            <li>• Receive candidate suggestions ranked by fit and skills.</li>
-            <li>• Review quick match insights without manual filtering.</li>
-            <li>• Move faster from posting a role to shortlisting applicants.</li>
+
+        <div className="bg-white border border-zinc-200 p-6 rounded-xl shadow-xs space-y-4">
+          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">For Recruiters</span>
+          <h3 className="text-lg font-semibold text-zinc-800">Post jobs and sort incoming applicants</h3>
+          <ul className="space-y-2 text-xs text-zinc-500 leading-relaxed">
+            <li>• Post active openings specifying company details and core technical tags.</li>
+            <li>• View a list of applied candidates sorted automatically from highest match score to lowest.</li>
+            <li>• Update applications status to "Shortlisted" or "Declined" to manage pipelines.</li>
           </ul>
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
-        {[
-          { title: 'What the employee sees', desc: 'Matched jobs, resume feedback, and a simple path to better opportunities.' },
-          { title: 'What the employer sees', desc: 'Suggested candidates, fit summaries, and a clearer hiring shortlist.' },
-          { title: 'What both sides gain', desc: 'Less time wasted, better alignment, and a more transparent process.' },
-        ].map((item) => (
-          <div key={item.title} className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-neutral-900">{item.title}</h3>
-            <p className="mt-3 text-sm text-neutral-600">{item.desc}</p>
-          </div>
-        ))}
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-        {[
-          {
-            title: 'How the matching works',
-            items: ['We read resume and role content.', 'We compare skills and experience.', 'We surface the most relevant matches first.'],
-          },
-          {
-            title: 'What the rating means',
-            items: ['A clearer resume score for the employee.', 'Stronger suggestions after each update.', 'A practical guide to improve the profile.'],
-          },
-        ].map((card) => (
-          <div key={card.title} className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-            <h3 className="text-xl font-semibold text-neutral-900">{card.title}</h3>
-            <ul className="mt-4 space-y-2 text-sm text-neutral-600">
-              {card.items.map((item) => (
-                <li key={item}>• {item}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
-
-      <section className="rounded-2xl border border-[#b9e7e7] bg-white p-8 text-center">
-        <h2 className="text-2xl font-semibold text-neutral-900">Get started</h2>
-        <p className="mx-auto mt-3 max-w-lg text-sm text-neutral-600">Create an account and upload a resume to find matches or post a role to get candidate suggestions.</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link href="/register" className="rounded-md bg-[#76cdcd] px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-[#63bcbc]">Create account</Link>
-          <Link href="/login" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">Sign in</Link>
-          <Link href="/about" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">About us</Link>
-        </div>
-      </section>
     </div>
   );
 }

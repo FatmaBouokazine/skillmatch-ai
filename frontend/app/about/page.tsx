@@ -1,145 +1,126 @@
+'use client';
+
 import Link from 'next/link';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AboutPage() {
+  const { token } = useAuth();
+
   return (
-    <div className="flex flex-col gap-16">
-      <section className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+    <div className="flex flex-col gap-16 py-6 font-sans">
+      
+      {/* Introduction */}
+      <section className="grid gap-12 lg:grid-cols-2 items-center">
         <div className="space-y-6">
-          <span className="inline-flex rounded-full border border-[#b9e7e7] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#1f6d6d] shadow-sm">
-            About us
+          <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-white px-2.5 py-0.5 text-xs font-semibold text-zinc-500 shadow-xs">
+            About Us
           </span>
-          <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">
-            Making hiring smarter, not harder.
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 leading-tight">
+            Fusing human capability with skill analytics.
           </h1>
-          <p className="max-w-xl text-base text-neutral-600 sm:text-lg">
-            We believe the best hires happen when skills speak louder than keywords. SkillMatch AI was built to connect people with opportunities based on what they can actually do.
+          <p className="text-base sm:text-lg text-zinc-500 leading-relaxed">
+            SkillMatch AI was founded to replace keyword-stuffed search queries with authentic capability matches. We believe in transparency for candidates and immediate shortlisting for recruiters.
           </p>
-          <ul className="space-y-2 text-sm text-slate-600">
-            <li>• Candidates see better-fit jobs and resume guidance.</li>
-            <li>• Employers get candidate suggestions and shorter shortlists.</li>
-            <li>• The client gets a clearer product story with useful details.</li>
-          </ul>
           <div className="flex flex-wrap gap-3">
-            <Link href="/register" className="rounded-md bg-[#76cdcd] px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-[#63bcbc]">Create account</Link>
-            <Link href="/solution" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">Our solution</Link>
-            <Link href="/login" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">Sign in</Link>
+            {token ? (
+              <Link 
+                href="/dashboard" 
+                className="rounded-lg bg-zinc-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-zinc-800 transition duration-150"
+              >
+                Go to Workspace
+              </Link>
+            ) : (
+              <>
+                <Link 
+                  href="/register" 
+                  className="rounded-lg bg-zinc-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-zinc-800 transition duration-150"
+                >
+                  Get Started
+                </Link>
+                <Link 
+                  href="/solution" 
+                  className="rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-xs font-semibold text-zinc-600 hover:bg-zinc-50 transition duration-150"
+                >
+                  Explore Solution
+                </Link>
+              </>
+            )}
           </div>
         </div>
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-8 shadow-sm">
-          <h2 className="text-2xl font-semibold text-neutral-900">What the client sees</h2>
-          <ul className="mt-4 space-y-2 text-sm text-slate-600">
-            <li>• A simple workflow for matching jobs and people.</li>
-            <li>• Clear value on the first page, not technical detail.</li>
-            <li>• Easy next steps for both candidates and employers.</li>
-          </ul>
-        </div>
-      </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
-        {[
-          { title: 'What clients get', desc: 'A clearer way to match jobs and people without long manual screening.' },
-          { title: 'What candidates get', desc: 'Best-match jobs, resume feedback, and more confidence before applying.' },
-          { title: 'What employers get', desc: 'Useful candidate suggestions and a shorter path to strong applicants.' },
-        ].map((item) => (
-          <div key={item.title} className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-neutral-900">{item.title}</h2>
-            <p className="mt-3 text-sm text-neutral-600">{item.desc}</p>
-          </div>
-        ))}
-      </section>
-
-      {/* Mission */}
-      <section className="grid gap-8 lg:grid-cols-3">
-        {[
-          { title: 'Our mission', desc: 'Eliminate the noise in hiring by putting skill alignment at the center of every match — for both sides of the table.' },
-          { title: 'Our approach', desc: 'Combine AI-powered resume parsing with intelligent matching algorithms that understand context, not just keywords.' },
-          { title: 'Our vision', desc: 'A world where every candidate is seen for their real capabilities and every employer finds the talent they actually need.' },
-        ].map((item) => (
-          <div key={item.title} className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-neutral-900">{item.title}</h2>
-            <p className="mt-3 text-sm text-neutral-600">{item.desc}</p>
-          </div>
-        ))}
-      </section>
-
-      {/* Values */}
-      <section className="border-t border-[#d7f1f1] pt-12">
-        <h2 className="text-2xl font-semibold text-neutral-900">Core values</h2>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { title: 'Transparency', desc: 'Match scores and criteria are always visible. No black-box decisions.' },
-            { title: 'Fairness', desc: 'We evaluate skills, not pedigrees. Everyone gets a fair assessment.' },
-            { title: 'Simplicity', desc: 'Upload, match, connect. No unnecessary steps or complexity.' },
-            { title: 'Continuous improvement', desc: 'Our models learn from feedback to get better over time.' },
-          ].map((v) => (
-            <div key={v.title} className="rounded-2xl border border-[#b9e7e7] bg-white p-5 shadow-sm">
-              <h3 className="font-semibold text-neutral-800">{v.title}</h3>
-              <p className="mt-2 text-sm text-neutral-600">{v.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold text-neutral-900">What the client sees</h2>
-          <ul className="mt-4 space-y-2 text-sm text-neutral-600">
-            <li>• A simple path to upload a resume or post a role.</li>
-            <li>• Clear match cards that explain why something fits.</li>
-            <li>• Short, useful feedback instead of technical detail.</li>
-          </ul>
-        </div>
-        <div className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold text-neutral-900">Why this matters</h2>
-          <p className="mt-4 text-sm text-neutral-600">
-            People want to know where they fit and employers want a shorter path to the right profile. The product is built to make both sides understand the next step quickly.
-          </p>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="border-t border-[#d7f1f1] pt-12">
-        <h2 className="text-2xl font-semibold text-neutral-900">Team</h2>
-        <p className="mt-2 max-w-xl text-sm text-neutral-600">
-          A small team passionate about fixing how people and jobs find each other.
-        </p>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            { name: 'Azer Idoudi', role: 'Founder & CEO', bio: 'Leads the product vision and platform direction.' },
-            { name: 'Houssem B.S Salem', role: 'CTO', bio: 'Builds the AI matching and platform architecture.' },
-            { name: 'Yasmine Haba', role: 'Head of Product', bio: 'Shapes the experience for candidates and employers.' },
-            { name: 'Fatma Bouokkazine', role: 'Design & Operations', bio: 'Keeps the product clear, usable, and well-structured.' },
-          ].map((member) => (
-            <div key={member.name} className="rounded-2xl border border-[#b9e7e7] bg-white p-6 shadow-sm">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#b9e7e7] bg-[#eefcfc] text-sm font-semibold text-[#1f6d6d]">
-                {member.name.split(' ').map((n) => n[0]).join('')}
+        {/* Brand Core */}
+        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-8 space-y-6">
+          <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Our core philosophy</h3>
+          <ul className="space-y-4 text-sm text-zinc-600">
+            <li className="flex gap-3">
+              <span className="text-zinc-900 font-semibold">01.</span>
+              <div>
+                <p className="font-medium text-zinc-800">Clear capability ranking</p>
+                <p className="text-xs text-zinc-500 mt-0.5">We calculate true matching skill intersections instead of parsing tags blindly.</p>
               </div>
-              <h3 className="mt-4 font-semibold text-neutral-900">{member.name}</h3>
-              <p className="text-xs text-neutral-500">{member.role}</p>
-              <p className="mt-2 text-sm text-neutral-600">{member.bio}</p>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-zinc-900 font-semibold">02.</span>
+              <div>
+                <p className="font-medium text-zinc-800">Actionable Candidate scoring</p>
+                <p className="text-xs text-zinc-500 mt-0.5">Every resume evaluation yields clear, constructive feedback to help profiles align better.</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-zinc-900 font-semibold">03.</span>
+              <div>
+                <p className="font-medium text-zinc-800">No gatekeeping, no black-box AI</p>
+                <p className="text-xs text-zinc-500 mt-0.5">All criteria for matching scores are completely transparently shown to both parties.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      {/* Core Values */}
+      <section className="border-t border-zinc-200 pt-12 space-y-8">
+        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Platform values</h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { title: 'Technical Alignment', desc: 'Focusing exclusively on technical capability, skill matrices, and practical knowledge overlap.' },
+            { title: 'Simplicity', desc: 'A minimalist application shell, direct actions, and no unnecessary multi-stage pipelines.' },
+            { title: 'Equal Access', desc: 'Allowing candidates to see how their profile matches and adjust their skills dynamically.' },
+          ].map((v) => (
+            <div key={v.title} className="bg-white border border-zinc-200 p-5 rounded-xl shadow-xs">
+              <h3 className="font-semibold text-zinc-800 text-sm">{v.title}</h3>
+              <p className="mt-2 text-xs text-zinc-500 leading-relaxed">{v.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="rounded-2xl border border-[#b9e7e7] bg-white p-12 text-center">
-        <h2 className="text-3xl font-semibold text-neutral-900">Want to be part of the story?</h2>
-        <p className="mx-auto mt-3 max-w-lg text-sm text-neutral-600">
-          Create an account and see what SkillMatch AI can do for your hiring or job search.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link href="/register" className="rounded-md bg-[#76cdcd] px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-[#63bcbc]">
-            Get started
-          </Link>
-          <Link href="/login" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">
-            Sign in
-          </Link>
-          <Link href="/solution" className="rounded-md border border-[#b9e7e7] bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-[#eefcfc]">
-            Learn how it works
-          </Link>
+      {/* Team Section */}
+      <section className="border-t border-zinc-200 pt-12 space-y-8">
+        <div className="max-w-md">
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">The founding team</h2>
+          <p className="mt-1 text-xs text-zinc-500">A passionate engineering team focused on creating better talent intersections.</p>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { name: 'Azer Idoudi', role: 'Founder & CEO', bio: 'Leads the product vision and user interface standards.' },
+            { name: 'Houssem B.S Salem', role: 'CTO', bio: 'Builds backend matching mechanisms and secure API routing.' },
+            { name: 'Yasmine Haba', role: 'Head of Product', bio: 'Designs the functional workflow paths for candidates.' },
+            { name: 'Fatma Bouokkazine', role: 'Design & Operations', bio: 'Curates the beautiful minimalist aesthetic design systems.' },
+          ].map((m) => (
+            <div key={m.name} className="bg-white border border-zinc-200 p-5 rounded-xl shadow-xs space-y-4">
+              <div className="w-10 h-10 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold text-xs">
+                {m.name.split(' ').map(n => n[0]).join('')}
+              </div>
+              <div>
+                <h4 className="font-semibold text-sm text-zinc-800">{m.name}</h4>
+                <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-wider mt-0.5">{m.role}</p>
+                <p className="text-xs text-zinc-500 mt-2 leading-relaxed">{m.bio}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
+
     </div>
   );
 }

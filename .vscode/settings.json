@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd \"c:\\\\Users\\\\azeri\\\\OneDrive\\\\Desktop\\\\project dev\\\\skillmatch-ai\\\\backend\" ; node -e \"const app = require\\('\\./src/app'\\); const routes = \\[\\]; app\\._router\\.stack\\.forEach\\(r => \\{ if \\(r\\.handle && r\\.handle\\.stack\\) \\{ r\\.handle\\.stack\\.forEach\\(route => \\{ if \\(route\\.route\\) \\{ const methods = Object\\.keys\\(route\\.route\\.methods\\)\\.join\\(','\\)\\.toUpperCase\\(\\); console\\.log\\(methods, r\\.regexp, route\\.route\\.path\\); \\} \\}\\); \\} \\}\\);\" 2>&1 \\| Select-String \"employee\\|job\\|apply\" -SimpleMatch$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

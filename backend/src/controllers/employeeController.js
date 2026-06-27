@@ -3,6 +3,7 @@ const EmployeeProfile = require('../models/EmployeeProfile');
 const JobPost = require('../models/JobPost');
 const JobApplication = require('../models/JobApplication');
 const CompanyMember = require('../models/CompanyMember');
+const JobInvite = require('../models/JobInvite');
 const EmployerProfile = require('../models/EmployerProfile');
 const { parsePDF, scoreResume, extractResumeData } = require('../services/resumeService');
 
@@ -262,18 +263,54 @@ exports.getMyApplications = async (req, res) => {
 // GET /api/employee/company/invites
 exports.getCompanyInvites = async (req, res) => {
   try {
-    const invites = await CompanyMember.find({ userId: req.user._id, status: 'PENDING' })
-      .populate({ path: 'employerProfileId', select: 'companyName website description' })
+    const profile = await EmployeeProfile.findOne({ userId: req.user._id });
+
+    // 1. Job invites — employer directly invited this candidate to consider a job
+    let jobResults = [];
+    if (profile) {
+      const jobInvites = await JobInvite.find({ employeeProfileId: profile._id })
+        .populate({
+          path: 'jobPostId',
+          select: 'title location type',
+          populate: { path: 'employerProfileId', select: 'companyName' },
+        })
+        .sort({ createdAt: -1 })
+        .lean();
+
+      jobResults = jobInvites.map((inv) => ({
+        id: inv._id.toString(),
+        type: 'JOB',
+        status: inv.status,
+        message: inv.message || '',
+        jobTitle: inv.jobPostId?.title || '',
+        jobLocation: inv.jobPostId?.location || '',
+        employerProfile: inv.jobPostId?.employerProfileId || null,
+        createdAt: inv.createdAt,
+      }));
+    }
+
+    // 2. Company membership invites — employer invited this user to join their company
+    const memberInvites = await CompanyMember.find({ userId: req.user._id })
+      .populate({ path: 'employerProfileId', select: 'companyName website' })
+      .sort({ createdAt: -1 })
       .lean();
 
-    const result = invites.map((inv) => ({
+    const memberResults = memberInvites.map((inv) => ({
       id: inv._id.toString(),
-      company: inv.employerProfileId,
-      jobTitle: inv.jobTitle,
+      type: 'COMPANY',
+      status: inv.status === 'ACTIVE' ? 'ACCEPTED' : 'PENDING',
+      message: '',
+      jobTitle: inv.jobTitle || '',
+      employerProfile: inv.employerProfileId || null,
       createdAt: inv.createdAt,
     }));
 
-    res.status(200).json(result);
+    // Merge and sort newest first
+    const all = [...jobResults, ...memberResults].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    res.status(200).json(all);
   } catch (error) {
     console.error('GetCompanyInvites error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -286,17 +323,54 @@ exports.respondToCompanyInvite = async (req, res) => {
     const { id } = req.params;
     const { accept } = req.body;
 
+    // Try CompanyMember invite first
     const member = await CompanyMember.findOne({ _id: id, userId: req.user._id });
-    if (!member) return res.status(404).json({ message: 'Invite not found' });
-
-    if (accept) {
-      member.status = 'ACTIVE';
-      await member.save();
-      res.status(200).json({ message: 'Joined company successfully' });
-    } else {
-      await member.deleteOne();
-      res.status(200).json({ message: 'Invitation declined' });
+    if (member) {
+      if (accept) {
+        member.status = 'ACTIVE';
+        await member.save();
+        return res.status(200).json({ message: 'Joined company successfully' });
+      } else {
+        await member.deleteOne();
+        return res.status(200).json({ message: 'Invitation declined' });
+      }
     }
+
+    // Try JobInvite
+    const profile = await EmployeeProfile.findOne({ userId: req.user._id });
+    if (profile) {
+      const invite = await JobInvite.findOne({ _id: id, employeeProfileId: profile._id })
+        .populate({ path: 'jobPostId', select: 'employerProfileId title' });
+      if (invite) {
+        invite.status = accept ? 'ACCEPTED' : 'DECLINED';
+        await invite.save();
+
+        // On accept: automatically add employee to the recruiter's company as ACTIVE member
+        if (accept && invite.jobPostId?.employerProfileId) {
+          const employerProfileId = invite.jobPostId.employerProfileId;
+          const existing = await CompanyMember.findOne({
+            employerProfileId,
+            userId: req.user._id,
+          });
+          if (!existing) {
+            await CompanyMember.create({
+              employerProfileId,
+              userId: req.user._id,
+              role: 'EMPLOYEE',
+              jobTitle: invite.jobPostId.title || '',
+              status: 'ACTIVE',
+            });
+          } else if (existing.status !== 'ACTIVE') {
+            existing.status = 'ACTIVE';
+            await existing.save();
+          }
+        }
+
+        return res.status(200).json({ message: accept ? 'Invite accepted' : 'Invite declined' });
+      }
+    }
+
+    return res.status(404).json({ message: 'Invite not found' });
   } catch (error) {
     console.error('RespondToCompanyInvite error:', error);
     res.status(500).json({ message: 'Server error' });

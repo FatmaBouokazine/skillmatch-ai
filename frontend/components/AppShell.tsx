@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 
 type NavItem = { href: string; label: string; icon: React.ReactNode };
@@ -58,12 +58,14 @@ function getNavItems(role: string): NavItem[] {
 
   if (role === 'EMPLOYEE') {
     return [
-      { href: '/employee/dashboard', label: 'Dashboard', icon: dashIcon },
-      { href: '/employee/jobs',      label: 'Jobs',      icon: briefIcon },
-      { href: '/employee/resume',    label: 'Resume',    icon: docIcon },
-      { href: '/employee/skills',    label: 'Skills',    icon: tagIcon },
-      { href: '/employee/profile',   label: 'Profile',   icon: userIcon },
-      { href: '/account',            label: 'Account',   icon: cogIcon },
+      { href: '/employee/dashboard',    label: 'Dashboard',    icon: dashIcon },
+      { href: '/employee/jobs',          label: 'Jobs',         icon: briefIcon },
+      { href: '/employee/applications',  label: 'Applications', icon: appIcon },
+      { href: '/employee/invites',       label: 'Invites',      icon: mailIcon },
+      { href: '/employee/resume',        label: 'Resume',       icon: docIcon },
+      { href: '/employee/skills',        label: 'Skills',       icon: tagIcon },
+      { href: '/employee/profile',       label: 'Profile',      icon: userIcon },
+      { href: '/account',                label: 'Account',      icon: cogIcon },
     ];
   }
   if (role === 'EMPLOYER') {
@@ -82,9 +84,32 @@ function getNavItems(role: string): NavItem[] {
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const role = user?.role ?? '';
+
+  // Profile completion check
+  const isProfileComplete =
+    role === 'EMPLOYEE'
+      ? !!(user?.employeeProfile?.firstName?.trim() && user?.employeeProfile?.lastName?.trim())
+      : role === 'EMPLOYER'
+      ? !!(user?.employerProfile?.firstName?.trim() && user?.employerProfile?.lastName?.trim())
+      : true;
+
+  const profilePath =
+    role === 'EMPLOYEE' ? '/employee/profile' : role === 'EMPLOYER' ? '/employer/profile' : '/account';
+
+  // Routes accessible before profile is complete
+  const allowedWhenIncomplete = [profilePath, '/account'];
+  const isAllowed = allowedWhenIncomplete.some((p) => pathname === p || pathname.startsWith(p + '/'));
+
+  useEffect(() => {
+    if (user && !isProfileComplete && !isAllowed) {
+      router.replace(profilePath);
+    }
+  }, [user, isProfileComplete, isAllowed, profilePath, router]);
+
   const navItems = getNavItems(role);
   const initials = user
     ? ((user.employeeProfile?.firstName?.[0] ?? '') +
@@ -141,10 +166,48 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </span>
           </div>
 
+          {/* Profile incomplete notice */}
+          {!isProfileComplete && (
+            <div className="px-3 py-3 bg-amber-50 border border-amber-200 rounded-xl space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                <span className="text-[11px] font-semibold text-amber-800">Complete your profile</span>
+              </div>
+              <p className="text-[10px] text-amber-700 leading-snug">
+                Fill in your name to unlock all features.
+              </p>
+              <Link
+                href={profilePath}
+                onClick={() => setMobileOpen(false)}
+                className="block text-center text-[11px] font-semibold py-1.5 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition"
+              >
+                Go to Profile
+              </Link>
+            </div>
+          )}
+
           {/* Nav */}
           <nav className="flex flex-col gap-0.5">
             {navItems.map((item) => {
               const active = pathname === item.href || pathname.startsWith(item.href + '/');
+              const locked = !isProfileComplete && !allowedWhenIncomplete.some((p) => item.href === p || item.href.startsWith(p + '/'));
+              if (locked) {
+                return (
+                  <span
+                    key={item.href}
+                    title="Complete your profile to unlock"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-300 cursor-not-allowed select-none"
+                  >
+                    {item.icon}
+                    {item.label}
+                    <svg className="w-3 h-3 ml-auto text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </span>
+                );
+              }
               return (
                 <Link
                   key={item.href}
@@ -152,7 +215,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150
                     ${active
-                      ? 'bg-violet-600 text-white font-medium shadow-sm'
+                      ? 'bg-[#76cdcd] text-white font-medium shadow-sm'
                       : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'}`}
                 >
                   {item.icon}

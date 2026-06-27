@@ -6,6 +6,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "SkillMatch AI",
   description: "A smarter way to connect recruiters and candidates.",
+  icons: {
+    icon: '/sLogo.svg',
+  },
 };
 
 export default function RootLayout({

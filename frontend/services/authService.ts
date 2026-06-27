@@ -1,116 +1,50 @@
-const AUTH_URL = 'http://localhost:5000/api/auth';
-const JOBS_URL = 'http://localhost:5000/api/jobs';
+import { api } from './api';
 
-export const registerUser = async (userData: Record<string, unknown>) => {
-  const response = await fetch(`${AUTH_URL}/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  });
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.message || 'Register failed');
-  }
-  return response.json();
-};
+export interface AuthUser {
+  id: string;
+  email: string;
+  role: 'EMPLOYEE' | 'EMPLOYER' | 'ADMIN';
+}
 
-export const loginUser = async (userData: Record<string, unknown>) => {
-  const response = await fetch(`${AUTH_URL}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  });
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.message || 'Login failed');
-  }
-  return response.json();
-};
+export interface AuthResponse {
+  token: string;
+  user: AuthUser;
+}
 
-export const getProfile = async (token: string) => {
-  const response = await fetch(`${AUTH_URL}/profile`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) {
-    throw new Error('Failed to fetch profile');
-  }
-  return response.json();
-};
+export const registerUser = (data: { email: string; password: string; role: string }) =>
+  api.post<AuthResponse>('/auth/register', data);
 
-export const updateProfile = async (userData: Record<string, unknown>, token: string) => {
-  const response = await fetch(`${AUTH_URL}/profile`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(userData),
-  });
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.message || 'Failed to update profile');
-  }
-  return response.json();
-};
+export const loginUser = (data: { email: string; password: string }) =>
+  api.post<AuthResponse>('/auth/login', data);
 
-export const evaluateResume = async (resumeText: string, token: string) => {
-  const response = await fetch(`${AUTH_URL}/resume`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ resumeText }),
-  });
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.message || 'Failed to evaluate resume');
-  }
-  return response.json();
-};
+export const getMe = () => api.get<any>('/auth/me');
 
-export const changePassword = async (
+export const updateAccount = (data: Record<string, unknown>) =>
+  api.put<any>('/account', data);
+
+export const getAccount = () => api.get<any>('/account');
+
+// Legacy dashboard helpers. The `api` helper attaches the auth token from
+// localStorage automatically, so the trailing `_token` arg is kept only for
+// backwards-compatible call signatures.
+export const updateProfile = (
+  userData: Record<string, unknown>,
+  _token?: string
+) => api.put<any>('/account', userData);
+
+export const evaluateResume = (resumeText: string, _token?: string) =>
+  api.post<any>('/employee/resume/extract', { resumeText });
+
+export const changePassword = (
   currentPassword: string,
   newPassword: string,
-  token: string
-) => {
-  const response = await fetch(`${AUTH_URL}/password`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ currentPassword, newPassword }),
-  });
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.message || 'Failed to change password');
-  }
-  return response.json();
-};
+  _token?: string
+) => api.put<any>('/account', { currentPassword, newPassword });
 
-export const getRecruiterJobs = async (token: string) => {
-  const response = await fetch(`${JOBS_URL}/recruiter`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) {
-    throw new Error('Failed to fetch recruiter jobs');
-  }
-  return response.json();
-};
+export const getRecruiterJobs = (_token?: string) =>
+  api.get<any>('/employer/jobs');
 
-export const createJob = async (jobData: Record<string, unknown>, token: string) => {
-  const response = await fetch(JOBS_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(jobData),
-  });
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.message || 'Failed to create job');
-  }
-  return response.json();
-};
+export const createJob = (
+  jobData: Record<string, unknown>,
+  _token?: string
+) => api.post<any>('/employer/jobs', jobData);

@@ -46,7 +46,7 @@ export default function EmployeeSkillsPage() {
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-zinc-900 animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-[#76cdcd] animate-spin" /></div>;
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -68,12 +68,12 @@ export default function EmployeeSkillsPage() {
           placeholder="e.g. React, Python, Figma…"
           value={newSkill}
           onChange={(e) => setNewSkill(e.target.value)}
-          className="flex-1 rounded-xl border border-zinc-200 px-4 py-2.5 text-sm outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition"
+          className="flex-1 rounded-xl border border-zinc-200 px-4 py-2.5 text-sm outline-none focus:border-[#76cdcd] focus:ring-1 focus:ring-[#e0f5f5] transition"
         />
         <button
           type="submit"
           disabled={adding || !newSkill.trim()}
-          className="px-5 py-2.5 bg-zinc-900 text-white text-sm font-semibold rounded-xl hover:bg-zinc-800 transition disabled:opacity-50"
+          className="px-5 py-2.5 bg-[#76cdcd] text-white text-sm font-semibold rounded-xl hover:bg-[#5ab5b5] transition disabled:opacity-50"
         >
           {adding ? '…' : 'Add'}
         </button>
@@ -91,12 +91,12 @@ export default function EmployeeSkillsPage() {
             {skills.map((skill) => (
               <span
                 key={skill.id}
-                className="inline-flex items-center gap-1.5 bg-zinc-100 text-zinc-700 text-sm font-medium px-3 py-1.5 rounded-full"
+                className="inline-flex items-center gap-1.5 bg-[#e0f5f5] text-[#3e9999] text-sm font-medium px-3 py-1.5 rounded-full border border-[#76cdcd]/30"
               >
                 {skill.name}
                 <button
                   onClick={() => handleRemove(skill.id, skill.name)}
-                  className="text-zinc-400 hover:text-zinc-900 transition leading-none"
+                  className="text-[#76cdcd]/60 hover:text-red-500 transition leading-none font-bold"
                   aria-label={`Remove ${skill.name}`}
                 >
                   ×

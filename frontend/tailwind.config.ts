@@ -9,7 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#7C3AED', // A purple shade inspired by the image
+        primary: '#7C3AED',
+        brand: {
+          DEFAULT: '#76cdcd',
+          light: '#e0f5f5',
+          dark: '#5ab5b5',
+          darker: '#3e9999',
+        },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

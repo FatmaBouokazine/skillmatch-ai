@@ -79,7 +79,7 @@ export default function EmployeeResumePage() {
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-zinc-900 animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-[#76cdcd] animate-spin" /></div>;
 
   const score = scoreData?.resumeScore ?? 0;
   const hints: string[] = Array.isArray(scoreData?.resumeHints) ? scoreData.resumeHints : [];
@@ -106,16 +106,16 @@ export default function EmployeeResumePage() {
         onDrop={handleDrop}
         onClick={() => fileRef.current?.click()}
         className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center gap-3 cursor-pointer transition
-          ${dragOver ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 hover:border-zinc-400 hover:bg-zinc-50'}`}
+          ${dragOver ? 'border-[#76cdcd] bg-[#e0f5f5]/30' : 'border-zinc-200 hover:border-[#76cdcd] hover:bg-[#e0f5f5]/20'}`}
       >
-        <svg className="w-10 h-10 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-10 h-10 text-[#76cdcd]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
         </svg>
         <div className="text-center">
           <p className="text-sm font-medium text-zinc-700">{uploading ? 'Uploading and scoring…' : 'Drop your PDF here or click to browse'}</p>
           <p className="text-xs text-zinc-400 mt-1">PDF only · max 5 MB</p>
         </div>
-        {uploading && <div className="w-6 h-6 rounded-full border-2 border-zinc-200 border-t-zinc-900 animate-spin" />}
+        {uploading && <div className="w-6 h-6 rounded-full border-2 border-zinc-200 border-t-[#76cdcd] animate-spin" />}
         <input ref={fileRef} type="file" accept="application/pdf" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
       </div>
 
@@ -151,7 +151,7 @@ export default function EmployeeResumePage() {
           <button
             onClick={handleExtract}
             disabled={extracting}
-            className="mt-2 w-full py-2.5 rounded-xl bg-zinc-900 text-white text-sm font-semibold hover:bg-zinc-800 transition disabled:opacity-50"
+            className="mt-2 w-full py-2.5 rounded-xl bg-[#76cdcd] text-white text-sm font-semibold hover:bg-[#5ab5b5] transition disabled:opacity-50"
           >
             {extracting ? 'Extracting with AI…' : '✨ Auto-fill Profile from Resume'}
           </button>

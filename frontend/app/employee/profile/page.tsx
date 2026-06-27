@@ -44,7 +44,7 @@ export default function EmployeeProfilePage() {
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-zinc-900 animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-[#76cdcd] animate-spin" /></div>;
 
   return (
     <div className="space-y-6 max-w-xl">
@@ -73,7 +73,7 @@ export default function EmployeeProfilePage() {
                 value={(form as any)[name]}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition"
+                className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-[#76cdcd] focus:ring-1 focus:ring-[#e0f5f5] transition"
               />
             </div>
           ))}
@@ -91,7 +91,7 @@ export default function EmployeeProfilePage() {
               value={(form as any)[name]}
               onChange={handleChange}
               placeholder={placeholder}
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition"
+              className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-[#76cdcd] focus:ring-1 focus:ring-[#e0f5f5] transition"
             />
           </div>
         ))}
@@ -104,14 +104,14 @@ export default function EmployeeProfilePage() {
             onChange={handleChange}
             rows={4}
             placeholder="Write a short professional summary about yourself…"
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition resize-none"
+            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-[#76cdcd] focus:ring-1 focus:ring-[#e0f5f5] transition resize-none"
           />
         </div>
 
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-2.5 bg-zinc-900 text-white text-sm font-semibold rounded-xl hover:bg-zinc-800 transition disabled:opacity-50"
+          className="w-full py-2.5 bg-[#76cdcd] text-white text-sm font-semibold rounded-xl hover:bg-[#5ab5b5] transition disabled:opacity-50"
         >
           {saving ? 'Saving…' : 'Save Profile'}
         </button>

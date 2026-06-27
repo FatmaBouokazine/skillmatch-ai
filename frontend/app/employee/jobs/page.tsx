@@ -12,8 +12,8 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 function MatchBar({ pct }: { pct: number }) {
-  const color = pct >= 70 ? 'bg-violet-600' : pct >= 40 ? 'bg-violet-400' : 'bg-zinc-300';
-  const textColor = pct >= 70 ? 'text-violet-700' : pct >= 40 ? 'text-violet-500' : 'text-zinc-400';
+  const color = pct >= 70 ? 'bg-emerald-500' : pct >= 40 ? 'bg-[#76cdcd]' : 'bg-zinc-300';
+  const textColor = pct >= 70 ? 'text-emerald-600' : pct >= 40 ? 'text-[#3e9999]' : 'text-zinc-400';
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-1.5 rounded-full bg-zinc-100 overflow-hidden">
@@ -27,7 +27,7 @@ function MatchBar({ pct }: { pct: number }) {
 function Spinner() {
   return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-violet-600 animate-spin" />
+      <div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-[#76cdcd] animate-spin" />
     </div>
   );
 }
@@ -114,7 +114,7 @@ export default function EmployeeJobsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by title, company, location or skill…"
-          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-zinc-200 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
+          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-zinc-200 text-sm outline-none focus:border-[#76cdcd] focus:ring-2 focus:ring-[#e0f5f5] transition"
         />
       </div>
 
@@ -136,14 +136,14 @@ export default function EmployeeJobsPage() {
       ) : (
         <div className="space-y-3">
           {filtered.map((job) => (
-            <div key={job.id} className="bg-white border border-zinc-200 rounded-2xl p-5 space-y-3 hover:border-violet-200 transition">
+            <div key={job.id} className="bg-white border border-zinc-200 rounded-2xl p-5 space-y-3 hover:border-[#76cdcd]/40 transition">
               <div className="flex items-start justify-between gap-3">
                 {/* Job Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <h2 className="text-sm font-bold text-zinc-900 truncate">{job.title}</h2>
                     {job.hasApplied && (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200 shrink-0">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#e0f5f5] text-[#3e9999] border border-[#76cdcd]/40 shrink-0">
                         Applied ✓
                       </span>
                     )}
@@ -174,7 +174,7 @@ export default function EmployeeJobsPage() {
                   className={`shrink-0 px-4 py-2 text-xs font-semibold rounded-xl transition ${
                     job.hasApplied
                       ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
-                      : 'bg-violet-600 text-white hover:bg-violet-700'
+                      : 'bg-[#76cdcd] text-white hover:bg-[#5ab5b5]'
                   }`}
                 >
                   {job.hasApplied ? 'Applied' : 'Apply Now'}
@@ -204,7 +204,7 @@ export default function EmployeeJobsPage() {
                         key={skill}
                         className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${
                           matched
-                            ? 'bg-violet-50 text-violet-700 border-violet-200'
+                            ? 'bg-[#e0f5f5] text-[#3e9999] border-[#76cdcd]/40'
                             : 'bg-zinc-50 text-zinc-500 border-zinc-200'
                         }`}
                       >
@@ -224,7 +224,7 @@ export default function EmployeeJobsPage() {
                   {job.description.length > 120 && (
                     <button
                       onClick={() => setExpandedJob(expandedJob === job.id ? null : job.id)}
-                      className="text-[11px] text-violet-500 hover:text-violet-700 hover:underline mt-0.5"
+                      className="text-[11px] text-[#5ab5b5] hover:text-[#3e9999] hover:underline mt-0.5"
                     >
                       {expandedJob === job.id ? 'Show less ↑' : 'Show more ↓'}
                     </button>
@@ -281,7 +281,7 @@ export default function EmployeeJobsPage() {
                   onChange={(e) => setCoverLetter(e.target.value)}
                   rows={5}
                   placeholder="Briefly explain why you're a great fit for this role…"
-                  className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition resize-none"
+                  className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-[#76cdcd] focus:ring-2 focus:ring-[#e0f5f5] transition resize-none"
                 />
               </div>
             </div>
@@ -297,7 +297,7 @@ export default function EmployeeJobsPage() {
               <button
                 onClick={handleApply}
                 disabled={applying}
-                className="flex-1 py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-2.5 bg-[#76cdcd] text-white text-sm font-semibold rounded-xl hover:bg-[#5ab5b5] transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {applying && <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />}
                 {applying ? 'Submitting…' : 'Submit Application'}

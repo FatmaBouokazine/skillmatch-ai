@@ -27,3 +27,16 @@ export const sendInvite = (data: {
 }) => api.post<any>('/employer/invites', data);
 
 export const getInvites = () => api.get<any>('/employer/invites');
+
+// Applications
+export const getApplications = () => api.get<any>('/employer/applications');
+export const updateApplication = (id: string, status: 'ACCEPTED' | 'DECLINED' | 'PENDING') =>
+  api.put<any>(`/employer/applications/${id}`, { status });
+
+// Company
+export const getCompanyMembers = () => api.get<any>('/employer/company/members');
+export const inviteToCompany = (data: { email: string; jobTitle?: string }) =>
+  api.post<any>('/employer/company/invite', data);
+export const removeCompanyMember = (id: string) =>
+  api.delete<any>(`/employer/company/members/${id}`);
+

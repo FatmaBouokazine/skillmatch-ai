@@ -20,3 +20,14 @@ export const addSkill = (name: string) => api.post<any>('/employee/skills', { na
 export const removeSkill = (id: string) => api.delete<any>(`/employee/skills/${id}`);
 
 export const getJobMatches = () => api.get<any>('/employee/jobs/matches');
+
+export const applyForJob = (jobId: string, coverLetter?: string) =>
+  api.post<any>(`/employee/jobs/${jobId}/apply`, { coverLetter: coverLetter || '' });
+
+export const getMyApplications = () => api.get<any>('/employee/applications');
+
+export const getCompanyInvites = () => api.get<any>('/employee/company/invites');
+
+export const respondToCompanyInvite = (id: string, accept: boolean) =>
+  api.put<any>(`/employee/company/invites/${id}`, { accept });
+

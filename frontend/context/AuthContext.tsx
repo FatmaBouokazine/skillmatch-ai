@@ -2,13 +2,23 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getProfile } from '../services/authService';
+import { getMe } from '../services/authService';
+
+export type UserRole = 'EMPLOYEE' | 'EMPLOYER' | 'ADMIN';
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  role: UserRole;
+  employeeProfile?: any;
+  employerProfile?: any;
+}
 
 interface AuthContextType {
-  user: any | null;
+  user: AuthUser | null;
   token: string | null;
   loading: boolean;
-  login: (token: string) => Promise<void>;
+  login: (token: string, role: UserRole) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -16,7 +26,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -25,35 +35,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
-      fetchUserProfile(storedToken);
+      getMe()
+        .then((data) => setUser(data))
+        .catch(() => {
+          localStorage.removeItem('token');
+          setToken(null);
+        })
+        .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
   }, []);
 
-  const fetchUserProfile = async (authToken: string) => {
-    try {
-      const profile = await getProfile(authToken);
-      setUser(profile);
-    } catch (err) {
-      console.error('Failed to load user profile, logging out:', err);
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const login = async (newToken: string) => {
-    setLoading(true);
+  const login = async (newToken: string, role: UserRole) => {
     localStorage.setItem('token', newToken);
     setToken(newToken);
+    setLoading(true);
     try {
-      const profile = await getProfile(newToken);
-      setUser(profile);
-      router.push('/dashboard');
-    } catch (err) {
+      const userData = await getMe();
+      setUser(userData);
+      if (role === 'EMPLOYEE') router.push('/employee/dashboard');
+      else if (role === 'EMPLOYER') router.push('/employer/dashboard');
+      else router.push('/account');
+    } finally {
       setLoading(false);
-      throw err;
     }
   };
 
@@ -66,13 +71,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshUser = async () => {
-    if (token) {
-      try {
-        const profile = await getProfile(token);
-        setUser(profile);
-      } catch (err) {
-        console.error('Failed to refresh user profile:', err);
-      }
+    if (!token) return;
+    try {
+      const userData = await getMe();
+      setUser(userData);
+    } catch {
+      // silently ignore
     }
   };
 
@@ -84,9 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
+  return ctx;
 }

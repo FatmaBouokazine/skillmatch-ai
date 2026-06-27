@@ -9,6 +9,10 @@ const {
   addSkill,
   removeSkill,
   getJobMatches,
+  applyForJob,
+  getMyApplications,
+  getCompanyInvites,
+  respondToCompanyInvite,
 } = require('../controllers/employeeController');
 const { protect, requireRole } = require('../middleware/authMiddleware');
 const upload = require('../middleware/upload');
@@ -23,5 +27,9 @@ router.post('/resume/extract', ...emp, extractResume);
 router.post('/skills', ...emp, addSkill);
 router.delete('/skills/:id', ...emp, removeSkill);
 router.get('/jobs/matches', ...emp, getJobMatches);
+router.post('/jobs/:id/apply', ...emp, applyForJob);
+router.get('/applications', ...emp, getMyApplications);
+router.get('/company/invites', ...emp, getCompanyInvites);
+router.put('/company/invites/:id', ...emp, respondToCompanyInvite);
 
 module.exports = router;

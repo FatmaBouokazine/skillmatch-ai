@@ -1,6 +1,9 @@
 const path = require('path');
 const EmployeeProfile = require('../models/EmployeeProfile');
 const JobPost = require('../models/JobPost');
+const JobApplication = require('../models/JobApplication');
+const CompanyMember = require('../models/CompanyMember');
+const EmployerProfile = require('../models/EmployerProfile');
 const { parsePDF, scoreResume, extractResumeData } = require('../services/resumeService');
 
 // GET /api/employee/profile
@@ -168,6 +171,10 @@ exports.getJobMatches = async (req, res) => {
       .populate({ path: 'employerProfileId', select: 'companyName companyLogo' })
       .lean();
 
+    // Get all jobs this employee has applied to
+    const applied = await JobApplication.find({ employeeProfileId: profile._id }).select('jobPostId').lean();
+    const appliedIds = new Set(applied.map((a) => a.jobPostId.toString()));
+
     const scored = jobs.map((job) => {
       const required = Array.isArray(job.requiredSkills) ? job.requiredSkills : [];
       const matched = required.filter((s) => empSkillsLower.includes(s.toLowerCase()));
@@ -179,6 +186,7 @@ exports.getJobMatches = async (req, res) => {
         employerProfile: job.employerProfileId,
         matchPercentage,
         matchedSkills: matched,
+        hasApplied: appliedIds.has(job._id.toString()),
       };
     });
 
@@ -186,6 +194,111 @@ exports.getJobMatches = async (req, res) => {
     res.status(200).json(scored);
   } catch (error) {
     console.error('GetJobMatches error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// POST /api/employee/jobs/:id/apply
+exports.applyForJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { coverLetter } = req.body;
+
+    const profile = await EmployeeProfile.findOne({ userId: req.user._id });
+    if (!profile) return res.status(404).json({ message: 'Profile not found' });
+
+    const job = await JobPost.findById(id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    if (job.status !== 'OPEN') {
+      return res.status(400).json({ message: 'This job is no longer accepting applications' });
+    }
+
+    const existing = await JobApplication.findOne({ jobPostId: id, employeeProfileId: profile._id });
+    if (existing) return res.status(400).json({ message: 'You have already applied for this job' });
+
+    const application = await JobApplication.create({
+      jobPostId: id,
+      employeeProfileId: profile._id,
+      coverLetter: coverLetter || '',
+    });
+
+    res.status(201).json({ id: application._id.toString(), status: application.status });
+  } catch (error) {
+    console.error('ApplyForJob error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// GET /api/employee/applications
+exports.getMyApplications = async (req, res) => {
+  try {
+    const profile = await EmployeeProfile.findOne({ userId: req.user._id });
+    if (!profile) return res.status(404).json({ message: 'Profile not found' });
+
+    const applications = await JobApplication.find({ employeeProfileId: profile._id })
+      .populate({
+        path: 'jobPostId',
+        select: 'id title type location status',
+        populate: { path: 'employerProfileId', select: 'companyName' },
+      })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const result = applications.map((app) => ({
+      id: app._id.toString(),
+      status: app.status,
+      coverLetter: app.coverLetter,
+      createdAt: app.createdAt,
+      jobPost: app.jobPostId,
+    }));
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('GetMyApplications error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// GET /api/employee/company/invites
+exports.getCompanyInvites = async (req, res) => {
+  try {
+    const invites = await CompanyMember.find({ userId: req.user._id, status: 'PENDING' })
+      .populate({ path: 'employerProfileId', select: 'companyName website description' })
+      .lean();
+
+    const result = invites.map((inv) => ({
+      id: inv._id.toString(),
+      company: inv.employerProfileId,
+      jobTitle: inv.jobTitle,
+      createdAt: inv.createdAt,
+    }));
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('GetCompanyInvites error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// PUT /api/employee/company/invites/:id
+exports.respondToCompanyInvite = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { accept } = req.body;
+
+    const member = await CompanyMember.findOne({ _id: id, userId: req.user._id });
+    if (!member) return res.status(404).json({ message: 'Invite not found' });
+
+    if (accept) {
+      member.status = 'ACTIVE';
+      await member.save();
+      res.status(200).json({ message: 'Joined company successfully' });
+    } else {
+      await member.deleteOne();
+      res.status(200).json({ message: 'Invitation declined' });
+    }
+  } catch (error) {
+    console.error('RespondToCompanyInvite error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

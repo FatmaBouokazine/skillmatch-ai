@@ -5,6 +5,7 @@ const JobInvite = require('../models/JobInvite');
 const JobApplication = require('../models/JobApplication');
 const CompanyMember = require('../models/CompanyMember');
 const User = require('../models/User');
+const { computeJobMatchScore } = require('../services/matchingService');
 
 // GET /api/employer/profile
 exports.getProfile = async (req, res) => {
@@ -145,37 +146,34 @@ exports.getJobMatches = async (req, res) => {
     const profile = await EmployerProfile.findOne({ userId: req.user._id });
     if (!profile) return res.status(404).json({ message: 'Employer profile not found' });
 
-    const job = await JobPost.findOne({ _id: id, employerProfileId: profile._id });
+    const job = await JobPost.findOne({ _id: id, employerProfileId: profile._id }).lean();
     if (!job) return res.status(404).json({ message: 'Job post not found' });
-
-    const requiredSkills = Array.isArray(job.requiredSkills) ? job.requiredSkills : [];
-    const requiredLower = requiredSkills.map((s) => s.toLowerCase());
 
     const employees = await EmployeeProfile.find().lean();
 
-    const scored = employees.map((emp) => {
-      const empSkills = (emp.skills || []).map((s) => s.name.toLowerCase());
-      const matched = requiredLower.filter((s) => empSkills.includes(s));
-      const matchPercentage =
-        requiredSkills.length > 0
-          ? Math.round((matched.length / requiredSkills.length) * 100)
-          : 0;
-      return {
-        id: emp._id.toString(),
-        userId: emp.userId,
-        firstName: emp.firstName,
-        lastName: emp.lastName,
-        title: emp.title,
-        location: emp.location,
-        avatarUrl: emp.avatarUrl,
-        resumeScore: emp.resumeScore,
-        skills: emp.skills,
-        matchPercentage,
-        matchedSkills: matched,
-      };
-    });
+    const scored = employees
+      .map((emp) => {
+        const { score, matchedSkills, breakdown } = computeJobMatchScore(emp, job);
+        return {
+          id: emp._id.toString(),
+          userId: emp.userId,
+          firstName: emp.firstName,
+          lastName: emp.lastName,
+          title: emp.title,
+          location: emp.location,
+          avatarUrl: emp.avatarUrl,
+          resumeScore: emp.resumeScore,
+          skills: emp.skills,
+          education: emp.education,
+          experience: emp.experience,
+          matchPercentage: score,
+          matchedSkills,
+          breakdown,
+        };
+      })
+      .filter((e) => e.matchPercentage >= 50)
+      .sort((a, b) => b.matchPercentage - a.matchPercentage);
 
-    scored.sort((a, b) => b.matchPercentage - a.matchPercentage);
     res.status(200).json(scored);
   } catch (error) {
     console.error('GetJobMatches error:', error);

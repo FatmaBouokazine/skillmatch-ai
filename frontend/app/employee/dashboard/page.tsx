@@ -45,7 +45,7 @@ export default function EmployeeDashboardPage() {
   const acceptedApps = applications.filter((a) => a.status === 'ACCEPTED').length;
 
   return (
-    <div className="space-y-7 max-w-4xl">
+    <div className="space-y-7">
       {/* Welcome */}
       <div className="flex items-center justify-between">
         <div>

@@ -84,9 +84,9 @@ export default function JobMatchesPage() {
         </div>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold text-zinc-900">Matched Candidates</h1>
+            <h1 className="text-xl font-bold text-zinc-900">AI Matched Candidates</h1>
             <p className="text-sm text-zinc-500 mt-0.5">
-              {matches.length} candidate{matches.length !== 1 ? 's' : ''} ranked by skill match
+              {matches.length} candidate{matches.length !== 1 ? 's' : ''} matched ≥ 50% · scored by skills, title, experience &amp; education
               {topMatches > 0 && (
                 <span className="ml-2 text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                   {topMatches} strong match{topMatches !== 1 ? 'es' : ''}
@@ -125,7 +125,7 @@ export default function JobMatchesPage() {
             </svg>
           </div>
           <p className="text-sm font-medium text-zinc-500 mb-1">No candidates matched yet</p>
-          <p className="text-xs text-zinc-400">Make sure this job post has required skills set to enable matching.</p>
+          <p className="text-xs text-zinc-400">Only candidates with ≥ 50% AI match score appear here. Make sure your job post has required skills, a title, and a description to enable smart matching.</p>
           <Link
             href="/employer/jobs"
             className="inline-block mt-4 px-4 py-2 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition"
@@ -140,7 +140,7 @@ export default function JobMatchesPage() {
             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Candidate</span>
             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide hidden sm:block">Location</span>
             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide hidden md:block">Resume Score</span>
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Match</span>
+            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">AI Match</span>
             <span />
           </div>
 

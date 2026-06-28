@@ -54,9 +54,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const userData = await getMe();
       setUser(userData);
-      if (role === 'EMPLOYEE') router.push('/employee/dashboard');
-      else if (role === 'EMPLOYER') router.push('/employer/dashboard');
-      else router.push('/account');
+
+      // Gate: redirect to profile if name is not yet filled
+      const isComplete =
+        role === 'EMPLOYEE'
+          ? !!(userData.employeeProfile?.firstName?.trim() && userData.employeeProfile?.lastName?.trim())
+          : role === 'EMPLOYER'
+          ? !!(userData.employerProfile?.firstName?.trim() && userData.employerProfile?.lastName?.trim())
+          : true;
+
+      if (!isComplete) {
+        if (role === 'EMPLOYEE') router.push('/employee/profile');
+        else if (role === 'EMPLOYER') router.push('/employer/profile');
+        else router.push('/account');
+      } else {
+        if (role === 'EMPLOYEE') router.push('/employee/dashboard');
+        else if (role === 'EMPLOYER') router.push('/employer/dashboard');
+        else router.push('/account');
+      }
     } finally {
       setLoading(false);
     }

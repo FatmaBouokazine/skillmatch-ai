@@ -9,7 +9,7 @@ import { getEmployee, sendInvite, getJobs } from '../../../../services/employerS
 function ScoreRing({ score }: { score: number }) {
   const capped = Math.min(100, Math.max(0, score));
   const color =
-    capped >= 70 ? '#7c3aed' : capped >= 40 ? '#a78bfa' : '#a1a1aa';
+    capped >= 70 ? '#76cdcd' : capped >= 40 ? '#5ab5b5' : '#a1a1aa';
   const label =
     capped >= 70 ? 'Great' : capped >= 40 ? 'Fair' : 'Low';
 
@@ -39,7 +39,7 @@ function ScoreRing({ score }: { score: number }) {
 function Spinner() {
   return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-violet-600 animate-spin" />
+      <div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-[#76cdcd] animate-spin" />
     </div>
   );
 }
@@ -121,7 +121,7 @@ export default function EmployeeDetailPage() {
         {/* Top Strip */}
         <div className="flex items-center justify-between gap-4 px-6 py-5 border-b border-zinc-100">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-violet-600 text-white flex items-center justify-center text-xl font-bold shrink-0 select-none">
+            <div className="w-14 h-14 rounded-full bg-[#76cdcd] text-white flex items-center justify-center text-xl font-bold shrink-0 select-none">
               {initials}
             </div>
             <div>
@@ -171,6 +171,47 @@ export default function EmployeeDetailPage() {
           )}
         </div>
 
+        {/* Work Experience */}
+        {employee.experience?.length > 0 && (
+          <div className="px-6 py-4 border-b border-zinc-100">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-3">Work Experience</p>
+            <div className="space-y-3">
+              {employee.experience.map((exp: any, i: number) => (
+                <div key={i} className="border border-zinc-100 rounded-xl p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-zinc-800">{exp.role || 'Role'}</p>
+                    <span className="text-xs text-zinc-400">
+                      {exp.startDate}{exp.startDate && (exp.endDate || exp.current) ? ' – ' : ''}{exp.current ? 'Present' : exp.endDate}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-500">{exp.company}</p>
+                  {exp.description && <p className="text-xs text-zinc-500 leading-relaxed pt-1">{exp.description}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Education */}
+        {employee.education?.length > 0 && (
+          <div className="px-6 py-4 border-b border-zinc-100">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-3">Education</p>
+            <div className="space-y-3">
+              {employee.education.map((edu: any, i: number) => (
+                <div key={i} className="border border-zinc-100 rounded-xl p-3 space-y-0.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-zinc-800">{edu.institution}</p>
+                    <span className="text-xs text-zinc-400">
+                      {edu.startDate}{edu.startDate && edu.endDate ? ' – ' : ''}{edu.endDate}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-500">{edu.degree}{edu.degree && edu.field ? ' · ' : ''}{edu.field}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Resume Link */}
         <div className="px-6 py-4">
           {employee.resumeUrl ? (
@@ -207,7 +248,7 @@ export default function EmployeeDetailPage() {
                 id="invite-job"
                 value={selectedJob}
                 onChange={(e) => setSelectedJob(e.target.value)}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition bg-white"
+                className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-[#76cdcd] focus:ring-2 focus:ring-[#e0f5f5] transition bg-white"
               >
                 {jobs.map((j) => (
                   <option key={j.id} value={j.id}>{j.title}</option>
@@ -225,13 +266,13 @@ export default function EmployeeDetailPage() {
                 onChange={(e) => setMessage(e.target.value)}
                 rows={3}
                 placeholder="Hi! I think you'd be a great fit for this role…"
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition resize-none"
+                className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-[#76cdcd] focus:ring-2 focus:ring-[#e0f5f5] transition resize-none"
               />
             </div>
             <button
               type="submit"
               disabled={sending}
-              className="w-full py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 disabled:opacity-50 transition flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-[#76cdcd] text-white text-sm font-semibold rounded-xl hover:bg-[#5ab5b5] disabled:opacity-50 transition flex items-center justify-center gap-2"
             >
               {sending && (
                 <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
@@ -245,7 +286,7 @@ export default function EmployeeDetailPage() {
           <p className="text-sm text-zinc-400 mb-3">You have no open job posts to invite this candidate to.</p>
           <Link
             href="/employer/jobs"
-            className="inline-block px-4 py-2 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition"
+            className="inline-block px-4 py-2 bg-[#76cdcd] text-white text-sm font-semibold rounded-xl hover:bg-[#5ab5b5] transition"
           >
             Create a Job Post
           </Link>

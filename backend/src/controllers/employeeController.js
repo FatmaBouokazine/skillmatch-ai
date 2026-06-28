@@ -5,7 +5,8 @@ const JobApplication = require('../models/JobApplication');
 const CompanyMember = require('../models/CompanyMember');
 const JobInvite = require('../models/JobInvite');
 const EmployerProfile = require('../models/EmployerProfile');
-const { parsePDF, scoreResume, extractResumeData } = require('../services/resumeService');
+const { parsePDF, scoreResume, scoreResumeWithAI, extractResumeData } = require('../services/resumeService');
+const { computeJobMatchScore } = require('../services/matchingService');
 
 // GET /api/employee/profile
 exports.getProfile = async (req, res) => {
@@ -22,14 +23,19 @@ exports.getProfile = async (req, res) => {
 // PUT /api/employee/profile
 exports.updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, title, bio, location, avatarUrl } = req.body;
+    const { firstName, lastName, title, bio, location, avatarUrl, phone, linkedIn, github, experience, education } = req.body;
     const updates = {};
-    if (firstName !== undefined) updates.firstName = firstName;
-    if (lastName !== undefined) updates.lastName = lastName;
-    if (title !== undefined) updates.title = title;
-    if (bio !== undefined) updates.bio = bio;
-    if (location !== undefined) updates.location = location;
-    if (avatarUrl !== undefined) updates.avatarUrl = avatarUrl;
+    if (firstName  !== undefined) updates.firstName  = firstName;
+    if (lastName   !== undefined) updates.lastName   = lastName;
+    if (title      !== undefined) updates.title      = title;
+    if (bio        !== undefined) updates.bio        = bio;
+    if (location   !== undefined) updates.location   = location;
+    if (avatarUrl  !== undefined) updates.avatarUrl  = avatarUrl;
+    if (phone      !== undefined) updates.phone      = phone;
+    if (linkedIn   !== undefined) updates.linkedIn   = linkedIn;
+    if (github     !== undefined) updates.github     = github;
+    if (experience !== undefined) updates.experience = experience;
+    if (education  !== undefined) updates.education  = education;
 
     const profile = await EmployeeProfile.findOneAndUpdate(
       { userId: req.user._id },
@@ -53,7 +59,12 @@ exports.uploadResume = async (req, res) => {
 
     const resumeUrl = `/uploads/resumes/${req.file.filename}`;
     const text = await parsePDF(req.file.path);
-    const { score, hints } = scoreResume(text);
+
+    // Run AI scoring and extraction in parallel for speed
+    const [{ score, hints }, extracted] = await Promise.all([
+      scoreResumeWithAI(text),
+      extractResumeData(text).catch(() => null),
+    ]);
 
     await EmployeeProfile.findOneAndUpdate(
       { userId: req.user._id },
@@ -65,6 +76,7 @@ exports.uploadResume = async (req, res) => {
       resumeUrl,
       resumeScore: score,
       resumeHints: hints,
+      extracted,
     });
   } catch (error) {
     console.error('UploadResume error:', error);
@@ -126,7 +138,7 @@ exports.addSkill = async (req, res) => {
       (s) => s.name.toLowerCase() === name.trim().toLowerCase()
     );
     if (duplicate) {
-      return res.status(400).json({ message: 'Skill already exists' });
+      return res.status(200).json(duplicate); // already exists — return it silently
     }
 
     profile.skills.push({ name: name.trim() });
@@ -195,6 +207,86 @@ exports.getJobMatches = async (req, res) => {
     res.status(200).json(scored);
   } catch (error) {
     console.error('GetJobMatches error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// GET /api/employee/jobs/ai-matches  — multi-factor AI scoring, only ≥ 50% matches
+exports.getAIJobMatches = async (req, res) => {
+  try {
+    const profile = await EmployeeProfile.findOne({ userId: req.user._id }).lean();
+    if (!profile) return res.status(404).json({ message: 'Profile not found' });
+
+    const jobs = await JobPost.find({ status: 'OPEN' })
+      .populate({ path: 'employerProfileId', select: 'companyName companyLogo' })
+      .lean();
+
+    const applied = await JobApplication.find({ employeeProfileId: profile._id }).select('jobPostId').lean();
+    const appliedIds = new Set(applied.map((a) => a.jobPostId.toString()));
+
+    const scored = jobs
+      .map((job) => {
+        const { score, matchedSkills, breakdown } = computeJobMatchScore(profile, job);
+        return {
+          ...job,
+          id: job._id.toString(),
+          employerProfile: job.employerProfileId,
+          matchPercentage: score,
+          matchedSkills,
+          breakdown,
+          hasApplied: appliedIds.has(job._id.toString()),
+        };
+      })
+      .filter((j) => j.matchPercentage >= 50)
+      .sort((a, b) => b.matchPercentage - a.matchPercentage);
+
+    res.status(200).json(scored);
+  } catch (error) {
+    console.error('GetAIJobMatches error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// GET /api/employee/jobs/:id
+exports.getJobById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const job = await JobPost.findOne({ _id: id, status: 'OPEN' })
+      .populate({ path: 'employerProfileId', select: 'companyName companyLogo website description' })
+      .lean();
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+
+    const profile = await EmployeeProfile.findOne({ userId: req.user._id }).lean();
+    let matchPercentage = 0;
+    let matchedSkills = [];
+    let breakdown = null;
+    let hasApplied = false;
+
+    if (profile) {
+      const result = computeJobMatchScore(profile, job);
+      matchPercentage = result.score;
+      matchedSkills   = result.matchedSkills;
+      breakdown       = result.breakdown;
+
+      const application = await JobApplication.findOne({
+        jobPostId: id,
+        employeeProfileId: profile._id,
+      }).lean();
+      hasApplied = !!application;
+    }
+
+    res.status(200).json({
+      ...job,
+      id: job._id.toString(),
+      employerProfile: job.employerProfileId,
+      matchPercentage,
+      matchedSkills,
+      breakdown,
+      hasApplied,
+    });
+  } catch (error) {
+    console.error('GetJobById error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

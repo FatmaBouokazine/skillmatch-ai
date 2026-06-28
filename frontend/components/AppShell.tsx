@@ -56,10 +56,18 @@ function getNavItems(role: string): NavItem[] {
     </svg>
   );
 
+  const sparkleIcon = (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+    </svg>
+  );
+
   if (role === 'EMPLOYEE') {
     return [
       { href: '/employee/dashboard',    label: 'Dashboard',    icon: dashIcon },
-      { href: '/employee/jobs',          label: 'Jobs',         icon: briefIcon },
+      { href: '/employee/matches',       label: 'AI Matches',   icon: sparkleIcon },
+      { href: '/employee/jobs',          label: 'Browse Jobs',  icon: briefIcon },
       { href: '/employee/applications',  label: 'Applications', icon: appIcon },
       { href: '/employee/invites',       label: 'Invites',      icon: mailIcon },
       { href: '/employee/resume',        label: 'Resume',       icon: docIcon },
@@ -256,6 +264,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {!isProfileComplete && (
+          <div className="bg-amber-50 border-b border-amber-200 px-5 py-3 flex items-center gap-3">
+            <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            <p className="text-sm text-amber-800 flex-1">
+              <span className="font-semibold">Profile incomplete.</span> Please fill in your first and last name to unlock the full platform.
+            </p>
+            <Link
+              href={profilePath}
+              className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition"
+            >
+              Complete Profile
+            </Link>
+          </div>
+        )}
         <main className="flex-1 p-5 md:p-8 overflow-y-auto">{children}</main>
       </div>
     </div>

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const client = require('prom-client');
 
 const authRoutes = require('./routes/authRoutes');
 const accountRoutes = require('./routes/accountRoutes');
@@ -9,6 +10,23 @@ const employerRoutes = require('./routes/employerRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
+
+client.collectDefaultMetrics();
+
+const httpRequestDuration = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'status']
+});
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = (Date.now() - start) / 1000;
+    httpRequestDuration.observe({ method: req.method, route: req.path, status: res.statusCode }, duration);
+  });
+  next();
+});
 
 app.use(
   cors({
@@ -27,6 +45,11 @@ app.use('/api/account', accountRoutes);
 app.use('/api/employee', employeeRoutes);
 app.use('/api/employer', employerRoutes);
 app.use('/api/admin', adminRoutes);
+
+app.get('/metrics', async (_req, res) => {
+  res.set('Content-Type', client.contentType);
+  res.end(await client.register.metrics());
+});
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 

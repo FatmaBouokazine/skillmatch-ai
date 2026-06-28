@@ -9,6 +9,8 @@ const {
   addSkill,
   removeSkill,
   getJobMatches,
+  getAIJobMatches,
+  getJobById,
   applyForJob,
   getMyApplications,
   getCompanyInvites,
@@ -27,6 +29,8 @@ router.post('/resume/extract', ...emp, extractResume);
 router.post('/skills', ...emp, addSkill);
 router.delete('/skills/:id', ...emp, removeSkill);
 router.get('/jobs/matches', ...emp, getJobMatches);
+router.get('/jobs/ai-matches', ...emp, getAIJobMatches);
+router.get('/jobs/:id', ...emp, getJobById);
 router.post('/jobs/:id/apply', ...emp, applyForJob);
 router.get('/applications', ...emp, getMyApplications);
 router.get('/company/invites', ...emp, getCompanyInvites);

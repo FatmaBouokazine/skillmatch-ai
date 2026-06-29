@@ -49,7 +49,7 @@ export default function EmployeeSkillsPage() {
   if (loading) return <div className="flex items-center justify-center h-64"><div className="w-7 h-7 rounded-full border-2 border-zinc-200 border-t-[#76cdcd] animate-spin" /></div>;
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6 ">
       <div>
         <h1 className="text-xl font-bold text-zinc-900">Skills</h1>
         <p className="text-sm text-zinc-500 mt-0.5">Add skills to improve your job match score.</p>

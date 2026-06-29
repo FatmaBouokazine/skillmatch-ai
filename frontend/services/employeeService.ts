@@ -21,6 +21,10 @@ export const removeSkill = (id: string) => api.delete<any>(`/employee/skills/${i
 
 export const getJobMatches = () => api.get<any>('/employee/jobs/matches');
 
+export const getAIJobMatches = () => api.get<any>('/employee/jobs/ai-matches');
+
+export const getJobDetail = (id: string) => api.get<any>(`/employee/jobs/${id}`);
+
 export const applyForJob = (jobId: string, coverLetter?: string) =>
   api.post<any>(`/employee/jobs/${jobId}/apply`, { coverLetter: coverLetter || '' });
 

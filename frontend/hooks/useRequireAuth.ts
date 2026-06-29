@@ -18,7 +18,7 @@ export function useRequireAuth(role?: UserRole) {
     if (role && user.role !== role) {
       if (user.role === 'EMPLOYEE') router.replace('/employee/dashboard');
       else if (user.role === 'EMPLOYER') router.replace('/employer/dashboard');
-      else router.replace('/account');
+      else router.replace('/admin/dashboard');
     }
   }, [user, loading, router, role]);
 

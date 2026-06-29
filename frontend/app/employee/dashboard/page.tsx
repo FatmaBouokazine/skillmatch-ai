@@ -43,9 +43,11 @@ export default function EmployeeDashboardPage() {
 
   const pendingApps = applications.filter((a) => a.status === 'PENDING').length;
   const acceptedApps = applications.filter((a) => a.status === 'ACCEPTED').length;
+  const declinedApps = applications.filter((a) => a.status === 'DECLINED').length;
+  const hasUpdates = acceptedApps > 0 || declinedApps > 0;
 
   return (
-    <div className="space-y-7 max-w-4xl">
+    <div className="space-y-7">
       {/* Welcome */}
       <div className="flex items-center justify-between">
         <div>
@@ -64,6 +66,54 @@ export default function EmployeeDashboardPage() {
           Upload Resume
         </Link>
       </div>
+
+      {/* Application status alert */}
+      {hasUpdates && (
+        <div className={`rounded-2xl p-4 flex items-center gap-3 border ${
+          acceptedApps > 0
+            ? 'bg-emerald-50 border-emerald-200'
+            : 'bg-red-50 border-red-200'
+        }`}>
+          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+            acceptedApps > 0 ? 'bg-emerald-100' : 'bg-red-100'
+          }`}>
+            {acceptedApps > 0 ? (
+              <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            {acceptedApps > 0 && (
+              <p className="text-sm font-semibold text-emerald-800">
+                🎉 {acceptedApps} application{acceptedApps !== 1 ? 's' : ''} accepted!
+              </p>
+            )}
+            {declinedApps > 0 && (
+              <p className={`text-sm font-semibold ${acceptedApps > 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+                {declinedApps} application{declinedApps !== 1 ? 's were' : ' was'} declined.
+              </p>
+            )}
+            <p className={`text-xs mt-0.5 ${acceptedApps > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+              Check your applications page for details.
+            </p>
+          </div>
+          <Link
+            href="/employee/applications"
+            className={`shrink-0 px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
+              acceptedApps > 0
+                ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                : 'bg-red-500 text-white hover:bg-red-600'
+            }`}
+          >
+            View →
+          </Link>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

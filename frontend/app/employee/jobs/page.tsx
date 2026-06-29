@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRequireAuth } from '../../../hooks/useRequireAuth';
 import { getJobMatches, applyForJob } from '../../../services/employeeService';
 
@@ -141,7 +142,12 @@ export default function EmployeeJobsPage() {
                 {/* Job Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <h2 className="text-sm font-bold text-zinc-900 truncate">{job.title}</h2>
+                    <Link
+                      href={`/employee/jobs/${job.id}`}
+                      className="text-sm font-bold text-zinc-900 hover:text-[#3e9999] hover:underline truncate"
+                    >
+                      {job.title}
+                    </Link>
                     {job.hasApplied && (
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#e0f5f5] text-[#3e9999] border border-[#76cdcd]/40 shrink-0">
                         Applied ✓
@@ -242,7 +248,7 @@ export default function EmployeeJobsPage() {
           className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
           onClick={(e) => { if (e.target === e.currentTarget) { setApplyJob(null); } }}
         >
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-xl w-full ">
             {/* Modal Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
               <div>

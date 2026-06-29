@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { getMyApplications } from '../services/employeeService';
+import { getApplications as getEmployerApplications } from '../services/employerService';
 
 type NavItem = { href: string; label: string; icon: React.ReactNode };
 
@@ -86,6 +88,26 @@ function getNavItems(role: string): NavItem[] {
       { href: '/account',               label: 'Account',      icon: cogIcon },
     ];
   }
+  if (role === 'ADMIN') {
+    const usersIcon = (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    );
+    const shieldIcon = (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    );
+    return [
+      { href: '/admin/dashboard',      label: 'Dashboard',    icon: dashIcon },
+      { href: '/admin/users',          label: 'Users',        icon: usersIcon },
+      { href: '/admin/jobs',           label: 'Job Posts',    icon: briefIcon },
+      { href: '/admin/applications',   label: 'Applications', icon: appIcon },
+      { href: '/admin/invites',        label: 'Invites',      icon: mailIcon },
+      { href: '/account',              label: 'Account',      icon: cogIcon },
+    ];
+  }
   return [{ href: '/account', label: 'Account', icon: cogIcon }];
 }
 
@@ -119,6 +141,34 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, [user, isProfileComplete, isAllowed, profilePath, router]);
 
   const navItems = getNavItems(role);
+
+  // Notification badge: count ACCEPTED/DECLINED applications for employees
+  const [appNotifCount, setAppNotifCount] = useState(0);
+  useEffect(() => {
+    if (role !== 'EMPLOYEE' || !user) return;
+    getMyApplications()
+      .then((apps: any[]) => {
+        const count = Array.isArray(apps)
+          ? apps.filter((a) => a.status === 'ACCEPTED' || a.status === 'DECLINED').length
+          : 0;
+        setAppNotifCount(count);
+      })
+      .catch(() => {});
+  }, [role, user]);
+
+  // Employer badge: count pending applications needing review
+  const [pendingAppCount, setPendingAppCount] = useState(0);
+  useEffect(() => {
+    if (role !== 'EMPLOYER' || !user) return;
+    getEmployerApplications()
+      .then((apps: any[]) => {
+        const count = Array.isArray(apps)
+          ? apps.filter((a) => a.status === 'PENDING').length
+          : 0;
+        setPendingAppCount(count);
+      })
+      .catch(() => {});
+  }, [role, user]);
   const initials = user
     ? ((user.employeeProfile?.firstName?.[0] ?? '') +
        (user.employeeProfile?.firstName ? (user.employeeProfile?.lastName?.[0] ?? '') : (user.email?.[0] ?? 'U'))).toUpperCase() || user.email[0].toUpperCase()
@@ -227,7 +277,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                       : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'}`}
                 >
                   {item.icon}
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {item.href === '/employee/applications' && appNotifCount > 0 && (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                      active ? 'bg-white/30 text-white' : 'bg-[#76cdcd] text-white'
+                    }`}>
+                      {appNotifCount}
+                    </span>
+                  )}
+                  {item.href === '/employer/invites' && pendingAppCount > 0 && (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                      active ? 'bg-white/30 text-white' : 'bg-amber-500 text-white'
+                    }`}>
+                      {pendingAppCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

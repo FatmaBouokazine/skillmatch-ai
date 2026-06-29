@@ -27,6 +27,35 @@ function keywords(text) {
 }
 
 /**
+ * Normalise a skill name for fuzzy comparison:
+ * strip all non-alphanumeric chars, lowercase, remove trailing "js"
+ * so e.g. "Node.js" → "node", "reactjs" → "react", "React" → "react"
+ */
+function normalizeSkill(s) {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')   // remove dots, dashes, spaces, etc.
+    .replace(/js$/, '');          // strip trailing "js": reactjs→react, nodejs→node
+}
+
+/**
+ * Return true when two skill name strings should be considered equivalent.
+ * Checks: exact lowercase → normalised exact → substring (min 4 chars each side).
+ */
+function skillsMatch(a, b) {
+  const al = a.toLowerCase();
+  const bl = b.toLowerCase();
+  if (al === bl) return true;                     // exact (case-insensitive)
+  const na = normalizeSkill(a);
+  const nb = normalizeSkill(b);
+  if (na === nb) return true;                     // normalised match (reactjs↔react)
+  if (na.length >= 4 && nb.length >= 4) {
+    if (na.includes(nb) || nb.includes(na)) return true; // substring (javascript↔java excluded by min-4)
+  }
+  return false;
+}
+
+/**
  * Compute a 0-100 match score between an employee profile and a job post.
  *
  * @param {object} emp  - EmployeeProfile document (lean)
@@ -36,14 +65,16 @@ function keywords(text) {
 function computeJobMatchScore(emp, job) {
   // ── 1. Skill match (40%) ────────────────────────────────────────────────
   const required = Array.isArray(job.requiredSkills)
-    ? job.requiredSkills.map(s => s.toLowerCase())
+    ? job.requiredSkills
     : [];
-  const empSkillsLower = (emp.skills || []).map(s => s.name.toLowerCase());
-  const matchedSkills = required.filter(s => empSkillsLower.includes(s));
+  const empSkills = (emp.skills || []).map(s => s.name);
+  const matchedSkills = required.filter(req =>
+    empSkills.some(es => skillsMatch(req, es))
+  );
 
   const skillScore = required.length > 0
     ? (matchedSkills.length / required.length) * 100
-    : 50; // neutral when job lists no required skills
+    : 65; // generous neutral when job lists no required skills
 
   // ── 2. Title / role relevance (20%) ────────────────────────────────────
   const jobTitleTokens = tokenize(job.title || '');

@@ -7,7 +7,7 @@ import AppShell from './AppShell';
 import Header from './Header';
 import Footer from './Footer';
 
-const APP_PREFIXES = ['/employee', '/employer', '/account'];
+const APP_PREFIXES = ['/employee', '/employer', '/account', '/admin'];
 
 export default function LayoutManager({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

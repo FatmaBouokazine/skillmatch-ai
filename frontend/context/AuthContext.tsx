@@ -66,11 +66,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!isComplete) {
         if (role === 'EMPLOYEE') router.push('/employee/profile');
         else if (role === 'EMPLOYER') router.push('/employer/profile');
-        else router.push('/account');
+        else router.push('/admin/dashboard');
       } else {
         if (role === 'EMPLOYEE') router.push('/employee/dashboard');
         else if (role === 'EMPLOYER') router.push('/employer/dashboard');
-        else router.push('/account');
+        else router.push('/admin/dashboard');
       }
     } finally {
       setLoading(false);

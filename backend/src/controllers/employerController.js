@@ -171,8 +171,8 @@ exports.getJobMatches = async (req, res) => {
           breakdown,
         };
       })
-      .filter((e) => e.matchPercentage >= 50)
-      .sort((a, b) => b.matchPercentage - a.matchPercentage);
+      .sort((a, b) => b.matchPercentage - a.matchPercentage)
+      .slice(0, 50); // top 50 sorted by score, no hard threshold
 
     res.status(200).json(scored);
   } catch (error) {

@@ -71,6 +71,7 @@ export default function JobMatchesPage() {
   if (loading || fetching) return <Spinner />;
 
   const topMatches = matches.filter((m) => m.matchPercentage >= 70).length;
+  const strongMatches = matches.filter((m) => m.matchPercentage >= 50).length;
 
   return (
     <div className="space-y-6 ">
@@ -86,10 +87,15 @@ export default function JobMatchesPage() {
           <div>
             <h1 className="text-xl font-bold text-zinc-900">AI Matched Candidates</h1>
             <p className="text-sm text-zinc-500 mt-0.5">
-              {matches.length} candidate{matches.length !== 1 ? 's' : ''} matched ≥ 50% · scored by skills, title, experience &amp; education
+              {matches.length} candidate{matches.length !== 1 ? 's' : ''} ranked by AI · skills, title, experience &amp; education
               {topMatches > 0 && (
                 <span className="ml-2 text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                   {topMatches} strong match{topMatches !== 1 ? 'es' : ''}
+                </span>
+              )}
+              {topMatches === 0 && strongMatches > 0 && (
+                <span className="ml-2 text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                  {strongMatches} good match{strongMatches !== 1 ? 'es' : ''}
                 </span>
               )}
             </p>
@@ -124,8 +130,8 @@ export default function JobMatchesPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-zinc-500 mb-1">No candidates matched yet</p>
-          <p className="text-xs text-zinc-400">Only candidates with ≥ 50% AI match score appear here. Make sure your job post has required skills, a title, and a description to enable smart matching.</p>
+          <p className="text-sm font-medium text-zinc-500 mb-1">No candidates found</p>
+          <p className="text-xs text-zinc-400">Add required skills, a job title, and a description to your job post so the AI can rank candidates for you.</p>
           <Link
             href="/employer/jobs"
             className="inline-block mt-4 px-4 py-2 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition"
@@ -152,6 +158,11 @@ export default function JobMatchesPage() {
               const score = emp.resumeScore ?? 0;
               const scoreColor = score >= 70 ? 'text-emerald-600' : score >= 40 ? 'text-amber-500' : 'text-zinc-400';
               const isInvited = invited.has(emp.id);
+              const mp = emp.matchPercentage;
+              const matchLabel = mp >= 70 ? { text: 'Strong', cls: 'text-emerald-700 bg-emerald-50 border-emerald-200' }
+                : mp >= 50 ? { text: 'Good', cls: 'text-violet-700 bg-violet-50 border-violet-200' }
+                : mp >= 30 ? { text: 'Fair', cls: 'text-amber-700 bg-amber-50 border-amber-200' }
+                : { text: 'Low', cls: 'text-zinc-500 bg-zinc-50 border-zinc-200' };
 
               return (
                 <div
@@ -181,8 +192,11 @@ export default function JobMatchesPage() {
                   </div>
 
                   {/* Match % with bar */}
-                  <div>
+                  <div className="flex flex-col items-end gap-1">
                     <MatchBar value={emp.matchPercentage} />
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${matchLabel.cls}`}>
+                      {matchLabel.text}
+                    </span>
                   </div>
 
                   {/* Actions */}
